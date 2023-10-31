@@ -1,5 +1,9 @@
 # cathybktour
 
+
+
+
+
 你好，請根據以下 Attractions遊憩景點API實作
 
 https://www.travel.taipei/open-api/swagger/ui/index#/
@@ -16,6 +20,10 @@ https://www.travel.taipei/open-api/swagger/ui/index#/
 將專案上傳至 GitHub 並設為公開分享
 
 螢幕錄製基本操作畫面，上傳Youtube影片(不要用Shorts)，設為非公開分享
+
+Youtube連結
+https://youtu.be/qLVzfa1PriE?si=U4HXw7jvZaGO1cZs
+
 
 必須要的
 
