@@ -1,0 +1,22 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()
+        // 添加 JitPack 存儲庫
+        maven {
+            url = 'https://jitpack.io'
+        }
+    }
+}
+rootProject.name = "cathybktour"
+include ':app'

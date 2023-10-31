@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">เที่ยวรอบๆ ไทเป</string>
+    <string name="attractions_title">สถานที่ท่องเที่ยวในเมืองไทเป %s/%s</string>
+    <string name="app_title">เที่ยวรอบๆ ไทเป</string>
+    <string name="selected_language">เลือกภาษา</string>
+    <string name="loading_please_wait">กำลังโหลด...</string>
+    <string name="open_time">เวลาเปิดทำการ: %s</string>
+    <string name="address">%s</string>
+    <string name="mobile">เบอร์ติดต่อ: %s</string>
+    <string name="web_address">เว็บไซต์: %s</string>
+</resources>

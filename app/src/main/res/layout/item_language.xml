@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <data>
+        <variable
+            name="language"
+            type="com.daniel.cathybktour.model.Language" />
+    </data>
+
+    <TextView
+        android:padding="8dp"
+        android:textColor="@color/black"
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@{language.displayName}" />
+
+</layout>
