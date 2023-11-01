@@ -42,8 +42,6 @@ class MainActivityViewModel : ViewModel() {
 
     val totalDenominator = MutableLiveData("0")
 
-    val checkAdapterSize = MutableLiveData<Unit>()
-
     //語言
     val languages = listOf(
         Language("繁體中文", "zh-tw", true),//默認被選中
@@ -70,8 +68,6 @@ class MainActivityViewModel : ViewModel() {
                     taipeiTourData.postValue(response.body())
                     totalDenominator.postValue(response.body()?.total.toString())
                     _isLoading.postValue(false)
-
-                    checkAdapterSize.postValue(Unit)//純觸發
 
                 } else {
 

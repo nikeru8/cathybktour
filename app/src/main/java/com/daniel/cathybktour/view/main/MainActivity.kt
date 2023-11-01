@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     private fun initData() {
 
         //init adapter
-        tourAdapter = TourAdapter { selectedTourItem ->
+        tourAdapter = TourAdapter(itemClick = { selectedTourItem ->
 
             val fragment = TourItemDetailFragment.newInstance(selectedTourItem)
             supportFragmentManager.beginTransaction()
@@ -60,6 +60,11 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.fl_content, fragment)
                 .addToBackStack(null)
                 .commit()
+
+        }) { //更新完currentList後，做判斷
+
+            tourAdapter.showFooter(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
+            viewModel.setIsRvLoading(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
 
         }
 
@@ -178,14 +183,6 @@ class MainActivity : AppCompatActivity() {
                 clError.visibility = View.GONE
 
             }
-
-        }
-
-        //判斷是否到達所有頁面底部
-        viewModel.checkAdapterSize.observe(this) {
-
-            viewModel.setIsRvLoading(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
-            tourAdapter.showFooter(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
 
         }
 
