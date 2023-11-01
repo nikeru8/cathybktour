@@ -5,6 +5,8 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.daniel.cathybktour.R
 import com.daniel.cathybktour.api.TourItem
@@ -13,15 +15,21 @@ import com.daniel.cathybktour.databinding.RvMainItemBinding
 import com.squareup.picasso.Picasso
 
 
-class TourAdapter(private val itemClick: (TourItem) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class TourAdapter(private val itemClick: (TourItem) -> Unit) :
+    ListAdapter<TourItem, RecyclerView.ViewHolder>(DiffItemCallback()) {
 
     private var TYPE_NORMAL = 0
     private var TYPE_FOOTER = 1
 
-    private var totalAttractions = mutableListOf<TourItem>()
-
     //是否顯示Footer
     private var showFooter: Boolean = true
+
+    private var firstIn = true
+
+    init {
+
+
+    }
 
     inner class AttractionAdapterViewHolder(var binding: RvMainItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -85,20 +93,23 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit) : RecyclerView.Adap
     }
 
     override fun getItemCount(): Int {
-
-        return if (totalAttractions.isNotEmpty()) totalAttractions.size + 1 else 0
-
+        val count = currentList.size
+        return if (showFooter && count > 0) count + 1 else count
     }
 
     override fun getItemViewType(position: Int): Int {
 
-        return if (position == itemCount - 1) {
+        if (currentList.isEmpty()) return TYPE_NORMAL
+
+        return if (position == itemCount - 1 && showFooter) {
 
             TYPE_FOOTER
 
-        } else
+        } else {
 
             TYPE_NORMAL
+
+        }
 
     }
 
@@ -108,7 +119,7 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit) : RecyclerView.Adap
 
             TYPE_NORMAL -> {
 
-                val item = totalAttractions[position]
+                val item = currentList[position]
                 item.let {
 
                     (holder as AttractionAdapterViewHolder).bind(it)
@@ -128,31 +139,54 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit) : RecyclerView.Adap
 
     }
 
-    @SuppressLint("NotifyDataSetChanged")
+    //資料疊加
     fun updateData(data: MutableList<TourItem>) {
 
-        totalAttractions.addAll(data)
-        notifyDataSetChanged()
+        val newItems = mutableListOf<TourItem>()
+        newItems.addAll(currentList)
+        newItems.addAll(data)
+        submitList(newItems)
 
     }
 
     @SuppressLint("NotifyDataSetChanged")
     fun removeAll() {
 
-        totalAttractions.clear()
-        notifyDataSetChanged()
+        submitList(emptyList())
 
     }
 
-    @SuppressLint("NotifyDataSetChanged")
     fun showFooter(show: Boolean) {
 
-        showFooter = show
-        notifyDataSetChanged()
+        if (currentList.isEmpty()) {
+
+            showFooter = false
+
+        } else if (showFooter != show) {
+
+            showFooter = show
+            submitList(currentList.toList())
+
+        }
 
     }
 
-    fun getAttractionsSize(): String = totalAttractions.count().toString()
-
+    fun getAttractionsSize(): String = currentList.count().toString()
 
 }
+
+private class DiffItemCallback : DiffUtil.ItemCallback<TourItem>() {
+    override fun areItemsTheSame(oldItem: TourItem, newItem: TourItem): Boolean {
+
+        return oldItem.id == newItem.id
+
+    }
+
+    override fun areContentsTheSame(oldItem: TourItem, newItem: TourItem): Boolean {
+
+        return oldItem == newItem
+
+    }
+}
+
+

@@ -1,8 +1,6 @@
 package com.daniel.cathybktour.repository
 
 import android.util.Log
-import androidx.lifecycle.LiveData
-import com.daniel.cathybktour.api.ApiResponse
 import com.daniel.cathybktour.api.RetrofitManager
 import com.daniel.cathybktour.api.TourModel
 import retrofit2.Call

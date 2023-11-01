@@ -29,7 +29,7 @@ data class TourItem(
     @SerializedName("fax")
     var fax: String? = "",
     @SerializedName("files")
-    var files: List<String?>? = listOf(),
+    var files: List<Files?>? = mutableListOf(),
     @SerializedName("friendly")
     var friendly: List<Friendly?>? = listOf(),
     @SerializedName("id")
@@ -122,4 +122,14 @@ data class Target(
     var id: Int? = 0,
     @SerializedName("name")
     var name: String? = "",
+) : Parcelable
+
+@Parcelize
+data class Files(
+    @SerializedName("src")
+    var src: String? = "",
+    @SerializedName("subject")
+    var subject: String? = "",
+    @SerializedName("ext")
+    var ext: String? = "",
 ) : Parcelable

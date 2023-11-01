@@ -104,7 +104,9 @@ class TourItemDetailFragment : Fragment() {
     }
 
     private fun initToolbar() {
+
         binding.toolbar.tvToolbarTitle.text = tourItem?.name
+
     }
 
 
@@ -162,7 +164,9 @@ class TourItemDetailFragment : Fragment() {
 
             // 檢查裝置是否有支援的應用程式來處理這個 Intent
             if (intent.resolveActivity(requireContext().packageManager) != null) {
+
                 startActivity(intent)
+
             } else {
 
                 Toast.makeText(activity, "沒有找到撥打電話的應用程式", Toast.LENGTH_SHORT).show()

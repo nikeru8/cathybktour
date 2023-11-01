@@ -22,26 +22,26 @@ class MainActivityViewModel() : ViewModel() {
      * true 可以繼續往下讀取
      * false 阻擋
      * */
-    private val _isRvLoading = MutableLiveData<Boolean>(true)
+    private val _isRvLoading = MutableLiveData(true)
     val isRvLoading: LiveData<Boolean> get() = _isRvLoading
     fun setIsRvLoading(value: Boolean) {
         _isRvLoading.value = value
     }
 
-    private val _isLoading = MutableLiveData<Boolean>(true)
+    private val _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
 
-    private val _isError = MutableLiveData<Boolean>(false)
+    private val _isError = MutableLiveData(false)
     val isError: LiveData<Boolean> get() = _isError
 
     // 跟踪當前的頁碼
-    private val _currentPage = MutableLiveData<Int>(1)
+    private val _currentPage = MutableLiveData(1)
 
     val currentPage: MutableLiveData<Int> get() = _currentPage
 
 
-    val totalDenominator = MutableLiveData<String>("0")
+    val totalDenominator = MutableLiveData("0")
 
     val checkAdapterSize = MutableLiveData<Unit>()
 
@@ -58,6 +58,8 @@ class MainActivityViewModel() : ViewModel() {
     )
 
     val taipeiTourData: MutableLiveData<TourModel> = MutableLiveData()
+
+    val changeLanguageStatus = MutableLiveData<Boolean>(false)
 
     fun callApiTaipeiTour(language: Language?, currentPage: Int?) {
         return repository.callTaipeiService(language?.code.toString(), currentPage).enqueue(object : Callback<TourModel> {
@@ -83,6 +85,7 @@ class MainActivityViewModel() : ViewModel() {
 
             override fun onFailure(call: Call<TourModel>, t: Throwable) {
 
+                Log.d(TAG, "checkpoint isError - ${t.localizedMessage}")
                 _isError.value = true
 
             }

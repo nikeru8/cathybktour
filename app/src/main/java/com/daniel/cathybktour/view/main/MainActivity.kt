@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -29,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var viewModel: MainActivityViewModel
     private lateinit var binding: ActivityMainBinding
     private lateinit var tourAdapter: TourAdapter
+    val llm = LinearLayoutManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,9 +62,9 @@ class MainActivity : AppCompatActivity() {
                 .commit()
 
         }
+
         binding.recyclerview.let { recyclerview ->
 
-            val llm = LinearLayoutManager(this)
             llm.orientation = LinearLayoutManager.VERTICAL
             recyclerview.layoutManager = llm
 
@@ -130,11 +130,27 @@ class MainActivity : AppCompatActivity() {
 
         viewModel.taipeiTourData.observe(this) {
 
-            tourAdapter.updateData(it.data)
+            if (viewModel.changeLanguageStatus.value == true) {
+
+                tourAdapter.submitList(it.data) {
+
+                    llm.scrollToPosition(0)
+
+                }
+
+                viewModel.changeLanguageStatus.value = false
+
+            } else {
+
+                tourAdapter.updateData(it.data)
+
+            }
+
 
         }
 
         viewModel.isError.observe(this) { isError ->
+
             binding.layoutLoading.apply {
 
                 mainView.visibility = if (isError) View.VISIBLE else View.GONE
@@ -143,6 +159,7 @@ class MainActivity : AppCompatActivity() {
                 tvError.text = getString(R.string.server_error)
 
             }
+
         }
 
         //observe是否loading頁面
@@ -162,15 +179,14 @@ class MainActivity : AppCompatActivity() {
         viewModel.checkAdapterSize.observe(this) {
 
             viewModel.setIsRvLoading(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
-            Log.d("TAG", "check tourAdapter.getAttractionsSize() - ${tourAdapter.getAttractionsSize()}")
-            Log.d("TAG", "check viewModel.totalDenominator.value - ${viewModel.totalDenominator.value}")
-            Log.d("TAG", "check setIsRvLoading - ${viewModel.isRvLoading.value}")
             tourAdapter.showFooter(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
 
         }
 
         //更改語言後判斷
         viewModel.currentLanguage.observe(this) { language ->
+
+            viewModel.changeLanguageStatus.value = true
 
             //中文 繁體 簡體中間會有 "-" 判斷是否有 "-"
             val parts = language.code.split("-")
@@ -186,9 +202,7 @@ class MainActivity : AppCompatActivity() {
 
             // 更新 UI
             initView()
-            tourAdapter.removeAll()
-            Log.d("TAG", "sssss language - $language , viewModel.currentPage.value - ${viewModel.currentPage.value}")
-            viewModel.callApiTaipeiTour(language = language, viewModel.currentPage.value)//init call api && selected language call api &&
+            viewModel.callApiTaipeiTour(language = language, viewModel.currentPage.value)//init call api && selected language call api
 
         }
 
