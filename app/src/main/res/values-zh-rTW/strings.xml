@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name">悠遊台北</string>
-    <string name="attractions_title"> 台北市景點: %s/%s</string>
+    <string name="attractions_title"> 台北市景點 %s/%s</string>
     <string name="app_title">悠遊台北</string>
     <string name="selected_language">選擇語言</string>
     <string name="loading_please_wait">讀取中...</string>
     <string name="open_time">營業時間: %s</string>
-    <string name="address">%s</string>
+    <string name="address">地址: %s</string>
     <string name="mobile">聯繫電話: %s</string>
     <string name="web_address">網址: %s</string>
+    <string name="server_error">選擇語言伺服器異常，請稍後再試。</string>
+    <string name="can_not_load_page">無法載入網頁，請之後再嘗試</string>
 </resources>

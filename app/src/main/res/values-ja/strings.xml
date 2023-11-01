@@ -1,11 +1,13 @@
 <resources>
-    <string name="app_name">台北を巡る</string>
-    <string name="attractions_title">台北市の観光地: %s/%s</string>
-    <string name="app_title">台北を巡る</string>
+    <string name="app_name">台北観光</string>
+    <string name="attractions_title"> 台北の観光名所 %s/%s</string>
+    <string name="app_title">台北観光</string>
     <string name="selected_language">言語を選択</string>
     <string name="loading_please_wait">読み込み中...</string>
     <string name="open_time">営業時間: %s</string>
-    <string name="address">%s</string>
-    <string name="mobile">連絡先: %s</string>
+    <string name="address">住所: %s</string>
+    <string name="mobile">連絡先電話番号: %s</string>
     <string name="web_address">ウェブサイト: %s</string>
+    <string name="server_error">言語選択サーバーエラー、後でもう一度お試しください。</string>
+    <string name="can_not_load_page">ページを読み込めません、後でもう一度お試しください。</string>
 </resources>

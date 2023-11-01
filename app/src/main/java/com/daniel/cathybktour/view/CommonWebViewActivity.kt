@@ -6,7 +6,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
@@ -164,6 +166,31 @@ class CommonWebViewActivity : AppCompatActivity() {
 
             view.settings.blockNetworkImage = false
             view.loadUrl("javascript:document.getElementsByName('viewport')[0].setAttribute('content', 'initial-scale=1.0,maximum-scale=10.0');");
+
+        }
+
+        override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+            super.onReceivedError(view, request, error)
+
+            // 在這裡判斷錯誤類型，並採取相應的行動
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                when (error.errorCode) {
+                    ERROR_HOST_LOOKUP -> {
+                        // DNS解析錯誤
+                    }
+
+                    ERROR_CONNECT -> {
+                        // 連接服務器錯誤
+                    }
+
+                    else -> {
+
+                    }
+                }
+            }
+
+            binding.wvCommonWebview.visibility = View.GONE
+            binding.tvError.visibility = View.VISIBLE
 
         }
     }
