@@ -203,6 +203,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    //選擇語言dialog
     private fun showLanguageDialog(context: Context, selectionCallback: (Language) -> Unit) {
 
         val dialogBinding = DialogLanguageSelectionBinding.inflate(LayoutInflater.from(context))
