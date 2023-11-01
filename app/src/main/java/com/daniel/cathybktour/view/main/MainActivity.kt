@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -105,7 +104,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun initView() {
 
-        Log.d("", "cjecfdsafewwqegew initView")
         binding.toolbar.ivBack.visibility = View.INVISIBLE
         binding.toolbar.llToolbarFeatures.visibility = View.VISIBLE
         binding.toolbar.tvToolbarTitle.text = getString(R.string.app_title)
@@ -136,12 +134,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initObserver() {
-
-        viewModel.taipeiTourData.observe(this) {
+        //獲取主要資料
+        viewModel.taipeiTourData.observe(this) { tourModel ->
 
             if (viewModel.changeLanguageStatus.value == true) {
 
-                tourAdapter.submitList(it.data) {
+                tourAdapter.submitList(tourModel?.data) {
 
                     llm.scrollToPosition(0)
 
@@ -151,10 +149,9 @@ class MainActivity : AppCompatActivity() {
 
             } else {
 
-                tourAdapter.updateData(it.data)
+                tourAdapter.updateData(tourModel?.data)
 
             }
-
 
         }
 
@@ -174,11 +171,11 @@ class MainActivity : AppCompatActivity() {
         //observe是否loading頁面
         viewModel.isLoading.observe(this) { isLoading ->
 
-            binding.layoutLoading.let { view ->
+            binding.layoutLoading.apply {
 
-                view.mainView.visibility = if (isLoading) View.VISIBLE else View.GONE
-                view.cdLoading.visibility = View.VISIBLE
-                view.clError.visibility = View.GONE
+                mainView.visibility = if (isLoading) View.VISIBLE else View.GONE
+                cdLoading.visibility = View.VISIBLE
+                clError.visibility = View.GONE
 
             }
 
@@ -197,16 +194,8 @@ class MainActivity : AppCompatActivity() {
 
             viewModel.changeLanguageStatus.value = true
 
-            //中文 繁體 簡體中間會有 "-" 判斷是否有 "-"
-            val parts = language.code.split("-")
-            val locale = if (parts.size > 1) {
-                Locale(parts[0], parts[1].toUpperCase())
-            } else {
-                Locale(parts[0])
-            }
-
             val config = Configuration()
-            config.setLocale(locale)
+            config.setLocale(viewModel.getLocale(language))
             resources.updateConfiguration(config, resources.displayMetrics)
 
             // 更新 UI

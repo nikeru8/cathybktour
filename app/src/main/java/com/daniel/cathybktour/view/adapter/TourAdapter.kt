@@ -140,11 +140,11 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit) :
     }
 
     //資料疊加
-    fun updateData(data: MutableList<TourItem>) {
+    fun updateData(data: MutableList<TourItem>?) {
 
         val newItems = mutableListOf<TourItem>()
         newItems.addAll(currentList)
-        newItems.addAll(data)
+        data?.let { newItems.addAll(it) }
         submitList(newItems)
 
     }

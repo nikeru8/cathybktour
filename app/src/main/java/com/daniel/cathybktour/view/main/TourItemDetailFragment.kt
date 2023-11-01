@@ -57,7 +57,6 @@ class TourItemDetailFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentTourItemDetailBinding.inflate(inflater, container, false)
 
-        Log.d(TAG, "tourItem - $tourItem")
         initView()
         initListener()
         return binding.root
