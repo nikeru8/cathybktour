@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -104,10 +105,18 @@ class MainActivity : AppCompatActivity() {
 
     private fun initView() {
 
+        Log.d("", "cjecfdsafewwqegew initView")
         binding.toolbar.ivBack.visibility = View.INVISIBLE
         binding.toolbar.llToolbarFeatures.visibility = View.VISIBLE
         binding.toolbar.tvToolbarTitle.text = getString(R.string.app_title)
         binding.layoutLoading.tvPleaseWait.text = getString(R.string.loading_please_wait)
+        if (viewModel.totalDenominator.value != "0") {
+            binding.title.text = getString(
+                R.string.attractions_title,
+                "1",
+                viewModel.totalDenominator.value
+            )
+        }
 
     }
 
