@@ -1,11 +1,13 @@
 <resources>
-    <string name="app_name">Travel around Taipei</string>
-    <string name="attractions_title">Taipei City attractions: %s/%s</string>
-    <string name="app_title">Travel around Taipei</string>
-    <string name="selected_language">Select a language</string>
-    <string name="loading_please_wait">Loading, please wait...</string>
+    <string name="app_name">Explore Taipei</string>
+    <string name="attractions_title"> Taipei Attractions %s/%s</string>
+    <string name="app_title">Explore Taipei</string>
+    <string name="selected_language">Select Language</string>
+    <string name="loading_please_wait">Loading...</string>
     <string name="open_time">Opening hours: %s</string>
-    <string name="address">%s</string>
-    <string name="mobile">Contact number: %s</string>
+    <string name="address">Address: %s</string>
+    <string name="mobile">Contact Number: %s</string>
     <string name="web_address">Website: %s</string>
+    <string name="server_error">Language selection server error, please try again later.</string>
+    <string name="can_not_load_page">Unable to load the page, please try again later</string>
 </resources>

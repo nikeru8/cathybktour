@@ -15,7 +15,7 @@ import com.daniel.cathybktour.databinding.RvMainItemBinding
 import com.squareup.picasso.Picasso
 
 
-class TourAdapter(private val itemClick: (TourItem) -> Unit) :
+class TourAdapter(private val itemClick: (TourItem) -> Unit, private val onDataUpdated: () -> Unit) :
     ListAdapter<TourItem, RecyclerView.ViewHolder>(DiffItemCallback()) {
 
     private var TYPE_NORMAL = 0
@@ -93,15 +93,15 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit) :
     }
 
     override fun getItemCount(): Int {
+
         val count = currentList.size
-        return if (showFooter && count > 0) count + 1 else count
+        return if (count > 0) count + 1 else 0
+
     }
 
     override fun getItemViewType(position: Int): Int {
 
-        if (currentList.isEmpty()) return TYPE_NORMAL
-
-        return if (position == itemCount - 1 && showFooter) {
+        return if (position == itemCount - 1) {
 
             TYPE_FOOTER
 
@@ -140,21 +140,15 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit) :
     }
 
     //資料疊加
-    fun updateData(data: MutableList<TourItem>) {
+    fun updateData(data: MutableList<TourItem>?) {
 
         val newItems = mutableListOf<TourItem>()
         newItems.addAll(currentList)
-        newItems.addAll(data)
+        data?.let { newItems.addAll(it) }
         submitList(newItems)
 
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun removeAll() {
-
-        submitList(emptyList())
-
-    }
 
     fun showFooter(show: Boolean) {
 
@@ -173,6 +167,15 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit) :
 
     fun getAttractionsSize(): String = currentList.count().toString()
 
+
+    override fun onCurrentListChanged(
+        previousList: MutableList<TourItem>,
+        currentList: MutableList<TourItem>,
+    ) {
+        super.onCurrentListChanged(previousList, currentList)
+        onDataUpdated() // 調用回調
+    }
+
 }
 
 private class DiffItemCallback : DiffUtil.ItemCallback<TourItem>() {
@@ -187,6 +190,7 @@ private class DiffItemCallback : DiffUtil.ItemCallback<TourItem>() {
         return oldItem == newItem
 
     }
+
 }
 
 

@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
     private fun initData() {
 
         //init adapter
-        tourAdapter = TourAdapter { selectedTourItem ->
+        tourAdapter = TourAdapter(itemClick = { selectedTourItem ->
 
             val fragment = TourItemDetailFragment.newInstance(selectedTourItem)
             supportFragmentManager.beginTransaction()
@@ -60,6 +60,11 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.fl_content, fragment)
                 .addToBackStack(null)
                 .commit()
+
+        }) { //更新完currentList後，做判斷
+
+            tourAdapter.showFooter(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
+            viewModel.setIsRvLoading(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
 
         }
 
@@ -108,6 +113,13 @@ class MainActivity : AppCompatActivity() {
         binding.toolbar.llToolbarFeatures.visibility = View.VISIBLE
         binding.toolbar.tvToolbarTitle.text = getString(R.string.app_title)
         binding.layoutLoading.tvPleaseWait.text = getString(R.string.loading_please_wait)
+        if (viewModel.totalDenominator.value != "0") {
+            binding.title.text = getString(
+                R.string.attractions_title,
+                "1",
+                viewModel.totalDenominator.value
+            )
+        }
 
     }
 
@@ -127,12 +139,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initObserver() {
-
-        viewModel.taipeiTourData.observe(this) {
+        //獲取主要資料
+        viewModel.taipeiTourData.observe(this) { tourModel ->
 
             if (viewModel.changeLanguageStatus.value == true) {
 
-                tourAdapter.submitList(it.data) {
+                tourAdapter.submitList(tourModel?.data) {
 
                     llm.scrollToPosition(0)
 
@@ -142,10 +154,9 @@ class MainActivity : AppCompatActivity() {
 
             } else {
 
-                tourAdapter.updateData(it.data)
+                tourAdapter.updateData(tourModel?.data)
 
             }
-
 
         }
 
@@ -165,21 +176,13 @@ class MainActivity : AppCompatActivity() {
         //observe是否loading頁面
         viewModel.isLoading.observe(this) { isLoading ->
 
-            binding.layoutLoading.let { view ->
+            binding.layoutLoading.apply {
 
-                view.mainView.visibility = if (isLoading) View.VISIBLE else View.GONE
-                view.cdLoading.visibility = View.VISIBLE
-                view.clError.visibility = View.GONE
+                mainView.visibility = if (isLoading) View.VISIBLE else View.GONE
+                cdLoading.visibility = View.VISIBLE
+                clError.visibility = View.GONE
 
             }
-
-        }
-
-        //判斷是否到達所有頁面底部
-        viewModel.checkAdapterSize.observe(this) {
-
-            viewModel.setIsRvLoading(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
-            tourAdapter.showFooter(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
 
         }
 
@@ -188,16 +191,8 @@ class MainActivity : AppCompatActivity() {
 
             viewModel.changeLanguageStatus.value = true
 
-            //中文 繁體 簡體中間會有 "-" 判斷是否有 "-"
-            val parts = language.code.split("-")
-            val locale = if (parts.size > 1) {
-                Locale(parts[0], parts[1].toUpperCase())
-            } else {
-                Locale(parts[0])
-            }
-
             val config = Configuration()
-            config.setLocale(locale)
+            config.setLocale(viewModel.getLocale(language))
             resources.updateConfiguration(config, resources.displayMetrics)
 
             // 更新 UI
@@ -208,6 +203,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    //選擇語言dialog
     private fun showLanguageDialog(context: Context, selectionCallback: (Language) -> Unit) {
 
         val dialogBinding = DialogLanguageSelectionBinding.inflate(LayoutInflater.from(context))

@@ -1,11 +1,13 @@
 <resources>
-    <string name="app_name">Du lịch xung quanh Đài Bắc</string>
-    <string name="attractions_title">Điểm du lịch thành phố Đài Bắc: %s/%s</string>
-    <string name="app_title">Du lịch xung quanh Đài Bắc</string>
+    <string name="app_name">Khám phá Đài Bắc</string>
+    <string name="attractions_title"> Điểm du lịch tại Đài Bắc %s/%s</string>
+    <string name="app_title">Khám phá Đài Bắc</string>
     <string name="selected_language">Chọn ngôn ngữ</string>
     <string name="loading_please_wait">Đang tải...</string>
     <string name="open_time">Giờ mở cửa: %s</string>
-    <string name="address">%s</string>
+    <string name="address">Địa chỉ: %s</string>
     <string name="mobile">Số điện thoại liên hệ: %s</string>
-    <string name="web_address">Địa chỉ web: %s</string>
+    <string name="web_address">Trang web: %s</string>
+    <string name="server_error">Lỗi máy chọn ngôn ngữ, vui lòng thử lại sau.</string>
+    <string name="can_not_load_page">Không thể tải trang web, vui lòng thử lại sau</string>
 </resources>

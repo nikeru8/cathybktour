@@ -1,19 +1,17 @@
 package com.daniel.cathybktour.repository
 
-import android.util.Log
 import com.daniel.cathybktour.api.RetrofitManager
 import com.daniel.cathybktour.api.TourModel
-import retrofit2.Call
+import retrofit2.Response
 
 class MainActivityRepository {
 
     private val TAG = MainActivityRepository::class.java.simpleName
     private val retrofit = RetrofitManager.callTaipeiTourService("call Tour Data")
 
-    fun callTaipeiService(language: String, page: Int?): Call<TourModel> {
+    suspend fun callTaipeiService(language: String, page: Int?): Response<TourModel> {
 
-        Log.d(TAG, "callTaipeiService")
-        return retrofit.getAttractions(language, page)
+        return retrofit.getAttractions(language, page?:1)
 
     }
 

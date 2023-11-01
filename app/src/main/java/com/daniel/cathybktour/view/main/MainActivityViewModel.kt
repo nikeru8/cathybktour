@@ -1,19 +1,18 @@
 package com.daniel.cathybktour.view.main
 
-import android.annotation.SuppressLint
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.daniel.cathybktour.api.TourModel
 import com.daniel.cathybktour.model.Language
 import com.daniel.cathybktour.repository.MainActivityRepository
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.launch
+import java.util.Locale
 
 
-class MainActivityViewModel() : ViewModel() {
+class MainActivityViewModel : ViewModel() {
 
     private val TAG = MainActivityViewModel::class.java.simpleName
     private val repository = MainActivityRepository()
@@ -43,8 +42,6 @@ class MainActivityViewModel() : ViewModel() {
 
     val totalDenominator = MutableLiveData("0")
 
-    val checkAdapterSize = MutableLiveData<Unit>()
-
     //語言
     val languages = listOf(
         Language("繁體中文", "zh-tw", true),//默認被選中
@@ -57,39 +54,34 @@ class MainActivityViewModel() : ViewModel() {
         Language("Tiếng Việt", "vi")
     )
 
-    val taipeiTourData: MutableLiveData<TourModel> = MutableLiveData()
+    val taipeiTourData: MutableLiveData<TourModel?> = MutableLiveData()
 
-    val changeLanguageStatus = MutableLiveData<Boolean>(false)
+    val changeLanguageStatus = MutableLiveData(false)
 
     fun callApiTaipeiTour(language: Language?, currentPage: Int?) {
-        return repository.callTaipeiService(language?.code.toString(), currentPage).enqueue(object : Callback<TourModel> {
-            @SuppressLint("NullSafeMutableLiveData")
-            override fun onResponse(call: Call<TourModel>, response: Response<TourModel>) {
+        viewModelScope.launch {
+            try {
 
+                val response = repository.callTaipeiService(language?.code.toString(), currentPage)
                 if (response.isSuccessful) {
 
-                    val model = response.body()
-                    taipeiTourData.value = model
-                    totalDenominator.value = model?.total.toString()
-                    _isLoading.value = false
-
-                    checkAdapterSize.value = Unit //純觸發
+                    taipeiTourData.postValue(response.body())
+                    totalDenominator.postValue(response.body()?.total.toString())
+                    _isLoading.postValue(false)
 
                 } else {
 
-                    _isError.value = true
+                    _isError.postValue(true)
 
                 }
 
-            }
+            } catch (e: Exception) {
 
-            override fun onFailure(call: Call<TourModel>, t: Throwable) {
-
-                Log.d(TAG, "checkpoint isError - ${t.localizedMessage}")
-                _isError.value = true
+                Log.d(TAG, "Error: ${e.localizedMessage}")
+                _isError.postValue(true)
 
             }
-        })
+        }
     }
 
     fun incrementPage() {
@@ -117,6 +109,19 @@ class MainActivityViewModel() : ViewModel() {
 
         _currentPage.value = 1 // 每當語言更改時，將頁碼重置為1
         _currentLanguage.value = language //更改當前語言
+
+    }
+
+    //中文 繁體 簡體中間會有 "-" 判斷是否有 "-"
+    fun getLocale(language: Language): Locale {
+
+        //中文 繁體 簡體中間會有 "-" 判斷是否有 "-"
+        val parts = language.code.split("-")
+        return if (parts.size > 1) {
+            Locale(parts[0], parts[1].toUpperCase())
+        } else {
+            Locale(parts[0])
+        }
 
     }
 

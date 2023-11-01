@@ -66,11 +66,9 @@ class RetrofitManager {
         .writeTimeout(20, java.util.concurrent.TimeUnit.SECONDS) //Write Time 20s
         .build()
 
-    //HomeFragment下方keyword 和 文章資料
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://www.travel.taipei/")
         .addConverterFactory(GsonConverterFactory.create())
-        .addCallAdapterFactory(LiveDataCallAdapterFactory())
         .client(mOkHttpClient)
         .build()
 
