@@ -9,57 +9,27 @@ import java.io.IOException
  * Common class used by API responses.
  * @param <T>
  */
-class ApiResponse<T> {
-
-    var code: Int = 500
-
-    @Nullable
-    val body: T?
-
-    @Nullable
-    val errorMessage: String?
-
-    @Nullable
-    var url: String?
-
-    constructor(error: Throwable, mUrl: String) {
-        code = 500
-        body = null
-        errorMessage = error.message
+class ApiResponse<T>(
+    val code: Int,
+    val body: T? = null,
+    val errorMessage: String? = null,
+    val url: String? = null
+) {
+    constructor(error: Throwable, mUrl: String) : this(
+        code = 500,
+        errorMessage = error.message,
         url = mUrl
-    }
+    )
 
-    constructor(response: Response<T>) {
-
-        code = response.code()
-        url = response.raw().request().url().toString()
-        if (response.isSuccessful) {
-            body = response.body()
-            errorMessage = null
-
-        } else {
-
-            var message: String? = null
-            if (response.errorBody() != null) {
-                try {
-                    message = response.errorBody()!!.string()
-                } catch (ignored: IOException) {
-                    Log.e(ignored.toString(), "error while parsing response")
-                }
-            }
-            if (message == null || message.trim { it <= ' ' }.isEmpty()) {
-                message = response.message()
-            }
-            errorMessage = message
-            body = null
-
-        }
-
-    }
+    constructor(response: Response<T>) : this(
+        code = response.code(),
+        url = response.raw().request().url().toString(),
+        body = if (response.isSuccessful) response.body() else null,
+        errorMessage = if (!response.isSuccessful) {
+            response.errorBody()?.string() ?: response.message()
+        } else null
+    )
 
     val isSuccessful: Boolean
         get() = code in 200..299
-
-    val getStatus: Int = code
-
 }

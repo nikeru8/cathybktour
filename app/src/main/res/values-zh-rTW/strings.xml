@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">悠遊台北</string>
-    <string name="attractions_title"> 台北市景點 %s/%s</string>
+    <string name="attractions_title"> 台北市景點: %s/%s</string>
     <string name="app_title">悠遊台北</string>
     <string name="selected_language">選擇語言</string>
     <string name="loading_please_wait">讀取中...</string>

@@ -48,8 +48,7 @@ class RetrofitManager {
 
             Log.d(
                 "TAG",
-                String.format("from - $from , RetrofitManager raw JSON response is: %s", rawJson) + ", \n" +
-                        "call: ${response.request().url()}"
+                String.format("call: ${response.request().url()} \n ,from - $from , RetrofitManager raw JSON response is: %s", rawJson)
             )
 
             // Re-create the response before returning it because body can be read only once

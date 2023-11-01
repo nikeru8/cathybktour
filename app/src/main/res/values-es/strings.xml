@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Viajar por Taipei</string>
-    <string name="attractions_title">Atracciones de la ciudad de Taipei %s/%s</string>
+    <string name="attractions_title">Atracciones de la ciudad de Taipei: %s/%s</string>
     <string name="app_title">Viajar por Taipei</string>
     <string name="selected_language">Seleccionar un idioma</string>
     <string name="loading_please_wait">Cargando, por favor espere...</string>

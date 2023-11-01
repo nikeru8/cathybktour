@@ -3,6 +3,7 @@ package com.daniel.cathybktour.view.adapter
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.daniel.cathybktour.R
@@ -11,12 +12,16 @@ import com.daniel.cathybktour.databinding.RvLoadingBinding
 import com.daniel.cathybktour.databinding.RvMainItemBinding
 import com.squareup.picasso.Picasso
 
+
 class TourAdapter(private val itemClick: (TourItem) -> Unit) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var TYPE_NORMAL = 0
     private var TYPE_FOOTER = 1
 
-    var totalAttractions = mutableListOf<TourItem>()
+    private var totalAttractions = mutableListOf<TourItem>()
+
+    //是否顯示Footer
+    private var showFooter: Boolean = true
 
     inner class AttractionAdapterViewHolder(var binding: RvMainItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -28,9 +33,9 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit) : RecyclerView.Adap
             binding.attractionDescription.text = model.introduction ?: "台北市景點介紹"
 
             //image
-            if (model.images?.isNotEmpty() == true && model.images?.get(0) != null) {
+            if (model.images?.isNotEmpty() == true && model.images.get(0) != null) {
 
-                val src = model.images?.get(0)?.src
+                val src = model.images[0]?.src
                 Picasso.get().load(src ?: "").placeholder(R.drawable.taipei_icon).into(binding.attractionImage)
 
             } else {
@@ -49,10 +54,15 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit) : RecyclerView.Adap
 
     }
 
-    inner class FooterViewHolder(binding: RvLoadingBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class FooterViewHolder(var binding: RvLoadingBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind() {
 
+            if (!showFooter) {
+
+                binding.tvLoading.visibility = View.GONE
+
+            }
 
         }
 
@@ -76,7 +86,7 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit) : RecyclerView.Adap
 
     override fun getItemCount(): Int {
 
-        return if (totalAttractions.size != 0) (totalAttractions.count().plus(1)) ?: 0 else 0
+        return if (totalAttractions.isNotEmpty()) totalAttractions.size + 1 else 0
 
     }
 
@@ -119,7 +129,7 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit) : RecyclerView.Adap
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun updateUser(data: MutableList<TourItem>) {
+    fun updateData(data: MutableList<TourItem>) {
 
         totalAttractions.addAll(data)
         notifyDataSetChanged()
@@ -134,8 +144,15 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit) : RecyclerView.Adap
 
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun showFooter(show: Boolean) {
+
+        showFooter = show
+        notifyDataSetChanged()
+
+    }
+
     fun getAttractionsSize(): String = totalAttractions.count().toString()
 
+
 }
-
-

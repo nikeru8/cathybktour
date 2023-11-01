@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">เที่ยวรอบๆ ไทเป</string>
-    <string name="attractions_title">สถานที่ท่องเที่ยวในเมืองไทเป %s/%s</string>
+    <string name="attractions_title">สถานที่ท่องเที่ยวในเมืองไทเป: %s/%s</string>
     <string name="app_title">เที่ยวรอบๆ ไทเป</string>
     <string name="selected_language">เลือกภาษา</string>
     <string name="loading_please_wait">กำลังโหลด...</string>

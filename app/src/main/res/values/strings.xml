@@ -8,4 +8,5 @@
     <string name="address">地址: %s</string>
     <string name="mobile">聯繫電話: %s</string>
     <string name="web_address">網址: %s</string>
+    <string name="server_error">選擇語言伺服器異常，請稍後再試。</string>
 </resources>

@@ -9,11 +9,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.daniel.cathybktour.R
-import com.daniel.cathybktour.api.Image
 import com.daniel.cathybktour.api.TourItem
 import com.daniel.cathybktour.databinding.FragmentTourItemDetailBinding
 import com.daniel.cathybktour.view.CommonWebViewActivity
@@ -65,53 +65,61 @@ class TourItemDetailFragment : Fragment() {
 
     private fun initView() {
 
+        // 1. 初始化工具列
+        initToolbar()
+
+        // 2. 初始化介紹文字段落
+        initSection(binding.layoutContent.tvIntroduction, tourItem?.introduction)
+
+        // 3. 初始化開放時間
+        initSection(binding.layoutContent.tvOpenTime, tourItem?.openTime, R.string.open_time)
+
+        // 4. 初始化地址
+        initSection(binding.layoutContent.tvAddress, tourItem?.address, R.string.address)
+
+        // 5. 初始化聯絡電話
+        initSection(binding.layoutContent.tvMobile, tourItem?.tel, R.string.mobile)
+
+        // 6. 初始化官方網站
+        initSection(binding.layoutContent.tvWeb, tourItem?.officialSite, R.string.web_address)
+
+        // 7. 初始化圖片展示區
+        initImageSection()
+
+    }
+
+    private fun initSection(textView: TextView, content: String?, stringResId: Int? = null) {
+
+        if (!content.isNullOrEmpty()) {
+
+            textView.visibility = View.VISIBLE
+            textView.text = stringResId?.let { getString(it, content) } ?: content
+
+        } else {
+
+            textView.visibility = View.GONE
+
+        }
+
+    }
+
+    private fun initToolbar() {
         binding.toolbar.tvToolbarTitle.text = tourItem?.name
+    }
 
-        if (!tourItem?.introduction.isNullOrEmpty()) {
-            binding.layoutContent.tvIntroduction.visibility = View.VISIBLE
-            binding.layoutContent.tvIntroduction.text = tourItem?.introduction
+
+    private fun initImageSection() {
+
+        val imageAdapter = if (tourItem?.images == null || tourItem?.images?.isEmpty() == true) {
+            ImagePagerAdapter()  // 這將使用默認圖片
         } else {
-            binding.layoutContent.tvIntroduction.visibility = View.GONE
+            ImagePagerAdapter(tourItem?.images ?: mutableListOf())
         }
 
-        if (!tourItem?.openTime.isNullOrEmpty()) {
-            binding.layoutContent.tvOpenTime.visibility = View.VISIBLE
-            binding.layoutContent.tvOpenTime.text = getString(R.string.open_time, tourItem?.openTime)
-        } else {
-            binding.layoutContent.tvOpenTime.visibility = View.GONE
-        }
-
-        if (!tourItem?.address.isNullOrEmpty()) {
-            binding.layoutContent.tvAddress.visibility = View.VISIBLE
-            binding.layoutContent.tvAddress.text = getString(R.string.address, tourItem?.address)
-        } else {
-            binding.layoutContent.tvAddress.visibility = View.GONE
-        }
-
-        if (!tourItem?.tel.isNullOrEmpty()) {
-            binding.layoutContent.tvMobile.visibility = View.VISIBLE
-            binding.layoutContent.tvMobile.text = getString(R.string.mobile, tourItem?.tel)
-        } else {
-            binding.layoutContent.tvMobile.visibility = View.GONE
-        }
-
-        if (!tourItem?.officialSite.isNullOrEmpty()) {
-            binding.layoutContent.tvWeb.visibility = View.VISIBLE
-            binding.layoutContent.tvWeb.text = getString(R.string.web_address, tourItem?.officialSite ?: "")
-        } else {
-            binding.layoutContent.tvWeb.visibility = View.GONE
-        }
-
-
-        if (tourItem?.images?.isEmpty() == true)
-            tourItem?.images?.add(Image(".jpg", "https://t4.ftcdn.net/jpg/04/73/25/49/360_F_473254957_bxG9yf4ly7OBO5I0O5KABlN930GwaMQz.jpg", ""))
-        val imageAdapter = ImagePagerAdapter(tourItem?.images)
         binding.layoutContent.viewPager.adapter = imageAdapter
 
-        //indicator 連動
-        TabLayoutMediator(binding.layoutContent.tlViewIndicator, binding.layoutContent.viewPager) { tab, position ->
-
-        }.attach()
+        // 連接指示器與ViewPager
+        TabLayoutMediator(binding.layoutContent.tlViewIndicator, binding.layoutContent.viewPager) { _, _ -> }.attach()
 
     }
 

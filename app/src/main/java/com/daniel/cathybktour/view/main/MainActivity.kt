@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -19,41 +20,15 @@ import com.daniel.cathybktour.utils.ViewModelFactory
 import com.daniel.cathybktour.view.adapter.LanguageAdapter
 import com.daniel.cathybktour.view.adapter.TourAdapter
 import com.jakewharton.rxbinding2.view.clicks
-import com.ncapdevi.fragnav.FragNavController
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
 
-    private val TAG = MainActivity::class.java.simpleName
-
     lateinit var viewModel: MainActivityViewModel
     private lateinit var binding: ActivityMainBinding
-
     private lateinit var tourAdapter: TourAdapter
-
-
-    //true 可以繼續往下讀取
-    //false 阻擋
-    private var isRvLoading = true
-
-    var totalDenominator = "0"
-
-    //語言
-    val languages = listOf(
-        Language("繁體中文", "zh-tw", true),//默認被選中
-        Language("简体中文", "zh-cn"),
-        Language("English", "en"),
-        Language("日本語", "ja"),
-        Language("한국어", "ko"),
-        Language("Español", "es"),
-        Language("ภาษาไทย", "th"),
-        Language("Tiếng Việt", "vi")
-    )
-
-    private val fragNavController: FragNavController = FragNavController(supportFragmentManager, R.id.fl_content)
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,28 +44,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
-    private fun initView() {
-
-        binding.toolbar.ivBack.visibility = View.INVISIBLE
-        binding.toolbar.llToolbarFeatures.visibility = View.VISIBLE
-        binding.toolbar.tvToolbarTitle.text = getString(R.string.app_title)
-        binding.layoutLoading.tvPleaseWait.text = getString(R.string.loading_please_wait)
-
-    }
-
     private fun initData() {
-
-        //observe是否loading頁面
-        viewModel.isLoading.observe(this) { isLoading ->
-
-            binding.layoutLoading.mainView.visibility = if (isLoading) View.VISIBLE else View.GONE
-
-        }
-
-
-        viewModel.setIndex(1)
-        viewModel.isLoading.value = true
 
         //init adapter
         tourAdapter = TourAdapter { selectedTourItem ->
@@ -108,7 +62,6 @@ class MainActivity : AppCompatActivity() {
                 .commit()
 
         }
-
         binding.recyclerview.let { recyclerview ->
 
             val llm = LinearLayoutManager(this)
@@ -119,27 +72,42 @@ class MainActivity : AppCompatActivity() {
 
             //分批顯示
             recyclerview.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                @SuppressLint("StringFormatMatches")
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 
                     super.onScrolled(recyclerView, dx, dy)
                     val layoutManager = recyclerView.layoutManager as LinearLayoutManager
                     val totalItemCount = layoutManager.itemCount
                     val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
-                    if (totalDenominator != "0") binding.title.text =
-                        getString(
-                            R.string.attractions_title,
-                            if (lastVisibleItem >= 0) lastVisibleItem.toString() else 0, //當選擇語言時，會遇到沒有item的情況，避免分母顯示成-1
-                            totalDenominator
-                        )
-                    if (isRvLoading && dy > 0 && lastVisibleItem == totalItemCount - 1) { //滑動到底部
 
-                        isRvLoading = false
+                    if (viewModel.totalDenominator.value != "0") {
+                        binding.title.text = getString(
+                            R.string.attractions_title,
+                            maxOf(lastVisibleItem, 0), //防止出現-1的情況
+                            viewModel.totalDenominator.value
+                        )
+                    }
+
+                    if (viewModel.isRvLoading.value == true && dy > 0 && lastVisibleItem == totalItemCount - 1) { //滑動到底部
+
                         viewModel.incrementPage()
+                        viewModel.callApiTaipeiTour(viewModel.getSelectedLanguage(), viewModel.currentPage.value) //底部call api
 
                     }
+
                 }
             })
         }
+        //init call api in currentLanguage observe
+
+    }
+
+    private fun initView() {
+
+        binding.toolbar.ivBack.visibility = View.INVISIBLE
+        binding.toolbar.llToolbarFeatures.visibility = View.VISIBLE
+        binding.toolbar.tvToolbarTitle.text = getString(R.string.app_title)
+        binding.layoutLoading.tvPleaseWait.text = getString(R.string.loading_please_wait)
 
     }
 
@@ -150,17 +118,7 @@ class MainActivity : AppCompatActivity() {
 
             showLanguageDialog(this) { selectedLanguage ->
 
-                val locale = Locale(selectedLanguage.code)
-                val config = Configuration()
-                config.setLocale(locale)
-                resources.updateConfiguration(config, resources.displayMetrics)
-
-                //更新語言
-                initView()
-
-                viewModel.isLoading.value = true
-                tourAdapter.removeAll()
-                viewModel.setLanguage(selectedLanguage.code)
+                viewModel.updateLanguage(selectedLanguage)
 
             }
 
@@ -170,38 +128,67 @@ class MainActivity : AppCompatActivity() {
 
     private fun initObserver() {
 
-        viewModel.isError.observe(this) { isError ->
+        viewModel.taipeiTourData.observe(this) {
 
-            binding.layoutLoading.mainView.visibility = if (isError) View.VISIBLE else View.GONE
-            binding.layoutLoading.pbLoadingGray.visibility = if (isError) View.GONE else View.VISIBLE
-            binding.layoutLoading.clError.visibility = if (isError) View.VISIBLE else View.GONE
-            binding.layoutLoading.tvError.text = "選擇語言伺服器異常，請稍後再試。"
+            tourAdapter.updateData(it.data)
 
         }
 
-        //讀取資料
-        viewModel.taipeiTourData.observe(this) { response ->
+        viewModel.isError.observe(this) { isError ->
+            binding.layoutLoading.apply {
 
-            if (response.isSuccessful) {
+                mainView.visibility = if (isError) View.VISIBLE else View.GONE
+                pbLoadingGray.visibility = if (isError) View.GONE else View.VISIBLE
+                clError.visibility = if (isError) View.VISIBLE else View.GONE
+                tvError.text = getString(R.string.server_error)
 
-                viewModel.isLoading.value = true
+            }
+        }
 
-                totalDenominator = response.body?.total.toString()
+        //observe是否loading頁面
+        viewModel.isLoading.observe(this) { isLoading ->
 
-                response.body?.data?.let { tourAdapter.updateUser(it) }
-                viewModel.isError.value = false
-                viewModel.isLoading.value = false
+            binding.layoutLoading.let { view ->
 
-
-            } else {
-
-                viewModel.isLoading.value = false
-                viewModel.isError.value = true
+                view.mainView.visibility = if (isLoading) View.VISIBLE else View.GONE
+                view.cdLoading.visibility = View.VISIBLE
+                view.clError.visibility = View.GONE
 
             }
 
-            isRvLoading = true
+        }
 
+        //判斷是否到達所有頁面底部
+        viewModel.checkAdapterSize.observe(this) {
+
+            viewModel.setIsRvLoading(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
+            Log.d("TAG", "check tourAdapter.getAttractionsSize() - ${tourAdapter.getAttractionsSize()}")
+            Log.d("TAG", "check viewModel.totalDenominator.value - ${viewModel.totalDenominator.value}")
+            Log.d("TAG", "check setIsRvLoading - ${viewModel.isRvLoading.value}")
+            tourAdapter.showFooter(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
+
+        }
+
+        //更改語言後判斷
+        viewModel.currentLanguage.observe(this) { language ->
+
+            //中文 繁體 簡體中間會有 "-" 判斷是否有 "-"
+            val parts = language.code.split("-")
+            val locale = if (parts.size > 1) {
+                Locale(parts[0], parts[1].toUpperCase())
+            } else {
+                Locale(parts[0])
+            }
+
+            val config = Configuration()
+            config.setLocale(locale)
+            resources.updateConfiguration(config, resources.displayMetrics)
+
+            // 更新 UI
+            initView()
+            tourAdapter.removeAll()
+            Log.d("TAG", "sssss language - $language , viewModel.currentPage.value - ${viewModel.currentPage.value}")
+            viewModel.callApiTaipeiTour(language = language, viewModel.currentPage.value)//init call api && selected language call api &&
 
         }
 
@@ -218,10 +205,10 @@ class MainActivity : AppCompatActivity() {
 
         val dialog = builder.create()
 
-        val adapter = LanguageAdapter(languages) { language ->
+        val adapter = LanguageAdapter(viewModel.languages) { language ->
 
             //當一個語言被選中時
-            languages.forEach { it.isSelected = false }
+            viewModel.languages.forEach { it.isSelected = false }
             language.isSelected = true
 
             selectionCallback(language)
@@ -233,6 +220,7 @@ class MainActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
 
         dialog.show()
+
     }
 
 }

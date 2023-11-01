@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">타이페이 주변 여행</string>
-    <string name="attractions_title">타이페이 시 관광지 %s/%s</string>
+    <string name="attractions_title">타이페이 시 관광지: %s/%s</string>
     <string name="app_title">타이페이 주변 여행</string>
     <string name="selected_language">언어 선택</string>
     <string name="loading_please_wait">로딩 중...</string>
