@@ -22,7 +22,7 @@ https://www.travel.taipei/open-api/swagger/ui/index#/
 螢幕錄製基本操作畫面，上傳Youtube影片(不要用Shorts)，設為非公開分享
 
 Youtube連結
-https://youtu.be/qLVzfa1PriE?si=U4HXw7jvZaGO1cZs
+https://youtu.be/4qz_Q9_ezGA
 
 
 必須要的
