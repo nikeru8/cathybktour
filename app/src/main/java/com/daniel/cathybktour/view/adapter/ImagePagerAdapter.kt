@@ -1,6 +1,5 @@
 package com.daniel.cathybktour.view.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -12,7 +11,7 @@ import com.squareup.picasso.Picasso
 class ImagePagerAdapter(private val imageList: MutableList<Image?>? = mutableListOf(Image(".jpg", "drawable", ""))) :
     RecyclerView.Adapter<ImagePagerAdapter.ImageViewHolder>() {
 
-    inner class ImageViewHolder(val binding: ImageItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ImageViewHolder(val binding: ImageItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(image: String?) {
 

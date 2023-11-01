@@ -10,4 +10,6 @@
     <string name="web_address">網址: %s</string>
     <string name="server_error">選擇語言伺服器異常，請稍後再試。</string>
     <string name="can_not_load_page">無法載入網頁，請之後再嘗試</string>
+    <string name="attraction">景點</string>
+    <string name="attraction_introduction">景點介紹</string>
 </resources>

@@ -32,10 +32,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
         viewModel = ViewModelProvider(this, ViewModelFactory()).get(MainActivityViewModel::class.java)
-        binding.mainViewModel = viewModel
-        setContentView(binding.root)
+        binding = ActivityMainBinding.inflate(layoutInflater).apply {
+
+            setContentView(this.root)
+            mainViewModel = viewModel
+
+        }
 
         initData()
         initView()
@@ -47,7 +50,7 @@ class MainActivity : AppCompatActivity() {
     private fun initData() {
 
         //init adapter
-        tourAdapter = TourAdapter(itemClick = { selectedTourItem ->
+        tourAdapter = TourAdapter(this@MainActivity, itemClick = { selectedTourItem ->
 
             val fragment = TourItemDetailFragment.newInstance(selectedTourItem)
             supportFragmentManager.beginTransaction()
@@ -68,15 +71,15 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        binding.recyclerview.let { recyclerview ->
+        binding.recyclerview.apply {
 
             llm.orientation = LinearLayoutManager.VERTICAL
-            recyclerview.layoutManager = llm
+            layoutManager = llm
 
-            recyclerview.adapter = tourAdapter
+            adapter = tourAdapter
 
             //分批顯示
-            recyclerview.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 @SuppressLint("StringFormatMatches")
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
 
@@ -107,18 +110,20 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun initView() {
+    private fun initView() = binding.run {
 
-        binding.toolbar.ivBack.visibility = View.INVISIBLE
-        binding.toolbar.llToolbarFeatures.visibility = View.VISIBLE
-        binding.toolbar.tvToolbarTitle.text = getString(R.string.app_title)
-        binding.layoutLoading.tvPleaseWait.text = getString(R.string.loading_please_wait)
+        with(toolbar) {
+            ivBack.visibility = View.INVISIBLE
+            llToolbarFeatures.visibility = View.VISIBLE
+            tvToolbarTitle.text = getString(R.string.app_title)
+        }
+
+        layoutLoading.tvPleaseWait.text = getString(R.string.loading_please_wait)
+
         if (viewModel.totalDenominator.value != "0") {
-            binding.title.text = getString(
-                R.string.attractions_title,
-                "1",
-                viewModel.totalDenominator.value
-            )
+
+            title.text = getString(R.string.attractions_title, "1", viewModel.totalDenominator.value)
+
         }
 
     }
@@ -206,30 +211,31 @@ class MainActivity : AppCompatActivity() {
     //選擇語言dialog
     private fun showLanguageDialog(context: Context, selectionCallback: (Language) -> Unit) {
 
-        val dialogBinding = DialogLanguageSelectionBinding.inflate(LayoutInflater.from(context))
-        val recyclerView: RecyclerView = dialogBinding.recyclerView
+        DialogLanguageSelectionBinding.inflate(LayoutInflater.from(context)).apply {
 
-        val builder = AlertDialog.Builder(context)
-        builder.setTitle(getString(R.string.selected_language))
-        builder.setView(dialogBinding.root)
+            val builder = AlertDialog.Builder(context)
+                .setTitle(getString(R.string.selected_language))
+                .setView(this.root)
+                .create()
 
-        val dialog = builder.create()
+            recyclerView.run {
 
-        val adapter = LanguageAdapter(viewModel.languages) { language ->
+                layoutManager = LinearLayoutManager(context)
+                adapter = LanguageAdapter(viewModel.languages) { language ->
 
-            //當一個語言被選中時
-            viewModel.languages.forEach { it.isSelected = false }
-            language.isSelected = true
+                    //當一個語言被選中時
+                    viewModel.languages.forEach { it.isSelected = false }
+                    language.isSelected = true
+                    selectionCallback(language)
+                    builder.dismiss()
 
-            selectionCallback(language)
-            dialog.dismiss()
+                }
+
+            }
+
+            builder.show()
 
         }
-
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = adapter
-
-        dialog.show()
 
     }
 

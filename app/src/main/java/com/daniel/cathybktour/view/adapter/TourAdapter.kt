@@ -2,6 +2,7 @@ package com.daniel.cathybktour.view.adapter
 
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,7 +16,7 @@ import com.daniel.cathybktour.databinding.RvMainItemBinding
 import com.squareup.picasso.Picasso
 
 
-class TourAdapter(private val itemClick: (TourItem) -> Unit, private val onDataUpdated: () -> Unit) :
+class TourAdapter(var activity: Activity,private val itemClick: (TourItem) -> Unit, private val onDataUpdated: () -> Unit) :
     ListAdapter<TourItem, RecyclerView.ViewHolder>(DiffItemCallback()) {
 
     private var TYPE_NORMAL = 0
@@ -24,24 +25,17 @@ class TourAdapter(private val itemClick: (TourItem) -> Unit, private val onDataU
     //是否顯示Footer
     private var showFooter: Boolean = true
 
-    private var firstIn = true
-
-    init {
-
-
-    }
-
-    inner class AttractionAdapterViewHolder(var binding: RvMainItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class AttractionAdapterViewHolder( var binding: RvMainItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("CheckResult", "SetTextI18n")
         fun bind(model: TourItem) {
 
-            binding.attractionName.text = model.name ?: "台北市景點"
+            binding.attractionName.text = model.name ?: activity.getString(R.string.attraction)
 
-            binding.attractionDescription.text = model.introduction ?: "台北市景點介紹"
+            binding.attractionDescription.text = model.introduction ?: activity.getString(R.string.attraction_introduction)
 
             //image
-            if (model.images?.isNotEmpty() == true && model.images.get(0) != null) {
+            if (model.images.isNotEmpty() && model.images.get(0) != null) {
 
                 val src = model.images[0]?.src
                 Picasso.get().load(src ?: "").placeholder(R.drawable.taipei_icon).into(binding.attractionImage)
