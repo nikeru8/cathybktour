@@ -6,33 +6,32 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.daniel.cathybktour.R
 import com.daniel.cathybktour.databinding.ActivityMainBinding
 import com.daniel.cathybktour.databinding.DialogLanguageSelectionBinding
 import com.daniel.cathybktour.model.Language
-import com.daniel.cathybktour.utils.ViewModelFactory
 import com.daniel.cathybktour.view.adapter.LanguageAdapter
 import com.daniel.cathybktour.view.adapter.TourAdapter
 import com.jakewharton.rxbinding2.view.clicks
+import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    lateinit var viewModel: MainActivityViewModel
+    private val viewModel: MainActivityViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
     private lateinit var tourAdapter: TourAdapter
     val llm = LinearLayoutManager(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this, ViewModelFactory()).get(MainActivityViewModel::class.java)
         binding = ActivityMainBinding.inflate(layoutInflater).apply {
 
             setContentView(this.root)

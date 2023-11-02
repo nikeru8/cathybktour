@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-android'
     id 'kotlin-parcelize'
+    id 'kotlin-kapt'
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -68,5 +70,13 @@ dependencies {
     //tab
     implementation 'com.ncapdevi:frag-nav:3.3.0'
 
+    //injection
+    implementation("com.google.dagger:hilt-android:2.44")
+    kapt("com.google.dagger:hilt-android-compiler:2.44")
 
+}
+
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }

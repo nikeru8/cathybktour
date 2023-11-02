@@ -44,11 +44,12 @@ class TourItemDetailFragment : Fragment() {
 
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
+        val view = binding.root
         initView()
         initListener()
-        return binding.root
+        return view
 
     }
 
@@ -66,7 +67,7 @@ class TourItemDetailFragment : Fragment() {
                 initSection(tvMobile, tourItem?.tel, R.string.mobile)
                 initSection(tvWeb, tourItem?.officialSite, R.string.web_address)
 
-                viewPager.adapter = ImagePagerAdapter(tourItem?.images)
+                viewPager.adapter = ImagePagerAdapter(tourItem?.images ?: null)
                 TabLayoutMediator(tlViewIndicator, viewPager) { _, _ -> }.attach()
 
             }

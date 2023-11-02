@@ -1,5 +1,6 @@
 package com.daniel.cathybktour.view.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -21,6 +22,7 @@ class ImagePagerAdapter(private val imageList: MutableList<Image?>? = mutableLis
 
             } else {
 
+                Log.d("TAG","checkpoint sssssss")
                 Picasso.get().load(R.drawable.taipei_icon).into(binding.imageView)
 
             }
