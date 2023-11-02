@@ -12,4 +12,10 @@
     <string name="can_not_load_page">無法載入網頁，請之後再嘗試</string>
     <string name="attraction">景點</string>
     <string name="attraction_introduction">景點介紹</string>
+
+    <array name="tab_main">
+        <item>首頁</item>
+        <item>探索</item>
+    </array>
+
 </resources>

@@ -1,34 +1,55 @@
 package com.daniel.cathybktour.view.main
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
+import android.util.Log
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.daniel.cathybktour.R
 import com.daniel.cathybktour.databinding.ActivityMainBinding
-import com.daniel.cathybktour.databinding.DialogLanguageSelectionBinding
-import com.daniel.cathybktour.model.Language
-import com.daniel.cathybktour.view.adapter.LanguageAdapter
+import com.daniel.cathybktour.databinding.TabItemBinding
+import com.daniel.cathybktour.utils.Utils
 import com.daniel.cathybktour.view.adapter.TourAdapter
-import com.jakewharton.rxbinding2.view.clicks
+import com.google.android.material.tabs.TabLayout
+import com.ncapdevi.fragnav.FragNavController
+import com.ncapdevi.fragnav.FragNavLogger
+import com.ncapdevi.fragnav.FragNavSwitchController
+import com.ncapdevi.fragnav.FragNavTransactionOptions
+import com.ncapdevi.fragnav.tabhistory.UniqueTabHistoryStrategy
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
-import java.util.concurrent.TimeUnit
 
 @AndroidEntryPoint
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), FragNavController.TransactionListener, FragNavController.RootFragmentListener {
 
     private val viewModel: MainActivityViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
-    private lateinit var tourAdapter: TourAdapter
-    val llm = LinearLayoutManager(this)
+
+    //主控制
+    private val mNavController = FragNavController(
+        supportFragmentManager,
+        R.id.fl_content
+    )
+
+    override val numberOfRootFragments: Int = 2
+    private lateinit var tabs: Array<String>
+
+    private val mTabIconsNormal = intArrayOf(
+
+        R.drawable.tab_home_n,
+        R.drawable.tab_explore_n
+
+    )
+
+    private val mTabIconsSelected = intArrayOf(
+
+        R.drawable.tab_home_s,
+        R.drawable.tab_explore_s
+
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,202 +60,176 @@ class MainActivity : AppCompatActivity() {
 
         }
 
-        initData()
-        initView()
-        initListener()
+        initTab()
+        initFragment(savedInstanceState)
         initObserver()
 
     }
 
-    private fun initData() {
+    private fun initObserver() {
 
-        //init adapter
-        tourAdapter = TourAdapter(this@MainActivity, itemClick = { selectedTourItem ->
+        viewModel.selectedTabIndex.observe(this) { tabIndex ->
 
-            val fragment = TourItemDetailFragment.newInstance(selectedTourItem)
-            supportFragmentManager.beginTransaction()
-                .setCustomAnimations(
-                    R.anim.slide_in_right,  //進入的動畫
-                    R.anim.slide_out_left,  //退出的動畫
-                    R.anim.slide_in_left,   //返回back
-                    R.anim.slide_out_right  //當前 Fragment 退出的動畫（當按下返回鍵時或調用 popBackStack() 時）
-                )
-                .replace(R.id.fl_content, fragment)
-                .addToBackStack(null)
-                .commit()
-
-        }) { //更新完currentList後，做判斷
-
-            tourAdapter.showFooter(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
-            viewModel.setIsRvLoading(tourAdapter.getAttractionsSize() != viewModel.totalDenominator.value)
+            mNavController.switchTab(tabIndex)
 
         }
 
-        binding.recyclerview.apply {
+    }
 
-            llm.orientation = LinearLayoutManager.VERTICAL
-            layoutManager = llm
+    override fun getRootFragment(index: Int): Fragment {
+        return when (index) {
 
-            adapter = tourAdapter
+            FragNavController.TAB1 -> HomeFragment.newInstance()
+            FragNavController.TAB2 -> ExploreFragment.newInstance()
+            else -> throw IllegalStateException("Need to send an index that we know")
 
-            //分批顯示
-            addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                @SuppressLint("StringFormatMatches")
-                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+        }
+    }
 
-                    super.onScrolled(recyclerView, dx, dy)
-                    val layoutManager = recyclerView.layoutManager as LinearLayoutManager
-                    val totalItemCount = layoutManager.itemCount
-                    val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
+    override fun onFragmentTransaction(fragment: Fragment?, transactionType: FragNavController.TransactionType) {
 
-                    if (viewModel.totalDenominator.value != "0") {
-                        binding.title.text = getString(
-                            R.string.attractions_title,
-                            maxOf(lastVisibleItem, 0), //防止出現-1的情況
-                            viewModel.totalDenominator.value
-                        )
-                    }
+        actionBar?.setDisplayHomeAsUpEnabled(mNavController.isRootFragment.not())
 
-                    if (viewModel.isRvLoading.value == true && dy > 0 && lastVisibleItem == totalItemCount - 1) { //滑動到底部
+    }
 
-                        viewModel.incrementPage()
-                        viewModel.callApiTaipeiTour(viewModel.getSelectedLanguage(), viewModel.currentPage.value) //底部call api
+    override fun onTabTransaction(fragment: Fragment?, index: Int) {
 
-                    }
+        // If we have a backstack, show the back button
+        supportActionBar?.setDisplayHomeAsUpEnabled(mNavController.isRootFragment.not())
+        actionBar?.setDisplayHomeAsUpEnabled(mNavController.isRootFragment.not())
+
+    }
+
+    private fun initTab() {
+
+        tabs = resources.getStringArray(R.array.tab_main)
+        for (i in tabs.indices) {
+            val tab = binding.bottomTabLayout.newTab()
+
+            // 使用 ViewBinding 來初始化 tab_item
+            val tabItemBinding = TabItemBinding.inflate(layoutInflater)
+            tab.customView = tabItemBinding.root
+
+            val icon = tabItemBinding.tabIcon
+
+            if (i == 0) {
+                icon.setImageResource(mTabIconsSelected[i])
+                val laParams = icon.layoutParams
+                laParams?.let {
+                    it.height = Utils.dp2pixel(this@MainActivity, 35)
+                    it.width = Utils.dp2pixel(this@MainActivity, 35)
+                    icon.layoutParams = it
+                }
+            } else {
+                val laParams = icon.layoutParams
+                laParams?.let {
+                    it.height = Utils.dp2pixel(this@MainActivity, 29)
+                    it.width = Utils.dp2pixel(this@MainActivity, 29)
+                    icon.layoutParams = it
+                }
+                icon.setImageResource(mTabIconsNormal[i])
+            }
+
+            icon.setImageDrawable(
+                Utils.setDrawableSelector(
+                    this,
+                    mTabIconsNormal[i],
+                    mTabIconsSelected[i]
+                )
+            )
+
+            val title = tabItemBinding.tabTitle
+            title.text = tabs[i]
+            val csl = ContextCompat.getColor(this@MainActivity, R.color.gray_80FFFFFF)
+            title.setTextColor(csl)
+
+            binding.bottomTabLayout.addTab(tab)
+        }
+
+        // 在所有 tabs 初始化完之後，將第 0 號位置的 tab 文字顏色設為白色
+        val initialTab = binding.bottomTabLayout.getTabAt(0)
+        val initialTitle = initialTab?.customView?.findViewById<TextView>(R.id.tab_title)
+        initialTitle?.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.white))
+
+    }
+
+    private fun initFragment(savedInstanceState: Bundle?) {
+
+        mNavController.apply {
+            transactionListener = this@MainActivity
+            rootFragmentListener = this@MainActivity
+            createEager = true
+
+            //log
+            fragNavLogger = object : FragNavLogger {
+                override fun error(message: String, throwable: Throwable) {
+                    Log.e("MainActivity", message, throwable)
+                }
+            }
+
+            //fragment切換時的狀態
+            fragmentHideStrategy = FragNavController.DETACH
+
+            //navigation策略
+            navigationStrategy = UniqueTabHistoryStrategy(object : FragNavSwitchController {
+                override fun switchTab(index: Int, transactionOptions: FragNavTransactionOptions?) {
+
+                    binding.bottomTabLayout.getTabAt(index)?.select()
 
                 }
             })
-        }
-        //init call api in currentLanguage observe
-
-    }
-
-    private fun initView() = binding.run {
-
-        with(toolbar) {
-            ivBack.visibility = View.INVISIBLE
-            llToolbarFeatures.visibility = View.VISIBLE
-            tvToolbarTitle.text = getString(R.string.app_title)
-        }
-
-        layoutLoading.tvPleaseWait.text = getString(R.string.loading_please_wait)
-
-        if (viewModel.totalDenominator.value != "0") {
-
-            title.text = getString(R.string.attractions_title, "1", viewModel.totalDenominator.value)
 
         }
 
-    }
+        binding.bottomTabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
 
-    @SuppressLint("CheckResult")
-    private fun initListener() {
+                val img = tab?.customView?.findViewById<ImageView>(R.id.tab_icon)
+                val title = tab?.customView?.findViewById<TextView>(R.id.tab_title)
+                val laParams = img?.layoutParams
 
-        binding.toolbar.llToolbarFeatures.clicks().throttleFirst(1000, TimeUnit.MILLISECONDS).subscribe {
-
-            showLanguageDialog(this) { selectedLanguage ->
-
-                viewModel.updateLanguage(selectedLanguage)
-
-            }
-
-        }
-
-    }
-
-    private fun initObserver() {
-        //獲取主要資料
-        viewModel.taipeiTourData.observe(this) { tourModel ->
-
-            if (viewModel.changeLanguageStatus.value == true) {
-
-                tourAdapter.submitList(tourModel?.data) {
-
-                    llm.scrollToPosition(0)
-
+                if (laParams != null) {
+                    laParams.height = Utils.dp2pixel(this@MainActivity, 35)
+                    laParams.width = Utils.dp2pixel(this@MainActivity, 35)
                 }
 
-                viewModel.changeLanguageStatus.value = false
+                title?.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.white))
 
-            } else {
+                img?.layoutParams = laParams
 
-                tourAdapter.updateData(tourModel?.data)
+                img?.setImageResource(mTabIconsSelected[tab.position])
 
-            }
-
-        }
-
-        viewModel.isError.observe(this) { isError ->
-
-            binding.layoutLoading.apply {
-
-                mainView.visibility = if (isError) View.VISIBLE else View.GONE
-                pbLoadingGray.visibility = if (isError) View.GONE else View.VISIBLE
-                clError.visibility = if (isError) View.VISIBLE else View.GONE
-                tvError.text = getString(R.string.server_error)
+                viewModel.switchTab(tab?.position ?: 0)
 
             }
 
-        }
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
 
-        //observe是否loading頁面
-        viewModel.isLoading.observe(this) { isLoading ->
+                val img = tab?.customView?.findViewById<ImageView>(R.id.tab_icon)
+                val title = tab?.customView?.findViewById<TextView>(R.id.tab_title)
 
-            binding.layoutLoading.apply {
-
-                mainView.visibility = if (isLoading) View.VISIBLE else View.GONE
-                cdLoading.visibility = View.VISIBLE
-                clError.visibility = View.GONE
-
-            }
-
-        }
-
-        //更改語言後判斷
-        viewModel.currentLanguage.observe(this) { language ->
-
-            viewModel.changeLanguageStatus.value = true
-
-            val config = Configuration()
-            config.setLocale(viewModel.getLocale(language))
-            resources.updateConfiguration(config, resources.displayMetrics)
-
-            // 更新 UI
-            initView()
-            viewModel.callApiTaipeiTour(language = language, viewModel.currentPage.value)//init call api && selected language call api
-
-        }
-
-    }
-
-    //選擇語言dialog
-    private fun showLanguageDialog(context: Context, selectionCallback: (Language) -> Unit) {
-
-        DialogLanguageSelectionBinding.inflate(LayoutInflater.from(context)).apply {
-
-            val builder = AlertDialog.Builder(context)
-                .setTitle(getString(R.string.selected_language))
-                .setView(this.root)
-                .create()
-
-            recyclerView.run {
-
-                layoutManager = LinearLayoutManager(context)
-                adapter = LanguageAdapter(viewModel.languages) { language ->
-
-                    //當一個語言被選中時
-                    viewModel.languages.forEach { it.isSelected = false }
-                    language.isSelected = true
-                    selectionCallback(language)
-                    builder.dismiss()
-
+                var laParams = img?.layoutParams
+                if (laParams != null) {
+                    laParams.height = Utils.dp2pixel(this@MainActivity, 29)
+                    laParams.width = Utils.dp2pixel(this@MainActivity, 29)
                 }
+                img?.layoutParams = laParams
+                img?.setImageResource(mTabIconsNormal[tab.position])
+
+                title?.setTextColor(ContextCompat.getColor(this@MainActivity, R.color.gray_80FFFFFF))
 
             }
 
-            builder.show()
+            override fun onTabReselected(tab: TabLayout.Tab?) {
 
-        }
+                mNavController.clearStack()
+
+            }
+
+        })
+
+        //設定初始化tab位置
+        mNavController.initialize(0, savedInstanceState)
 
     }
 

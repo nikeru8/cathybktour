@@ -2,10 +2,11 @@ package com.daniel.cathybktour.view.adapter
 
 
 import android.annotation.SuppressLint
-import android.app.Activity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +17,7 @@ import com.daniel.cathybktour.databinding.RvMainItemBinding
 import com.squareup.picasso.Picasso
 
 
-class TourAdapter(var activity: Activity,private val itemClick: (TourItem) -> Unit, private val onDataUpdated: () -> Unit) :
+class TourAdapter(var activity: FragmentActivity?, private val itemClick: (TourItem) -> Unit, private val onDataUpdated: () -> Unit) :
     ListAdapter<TourItem, RecyclerView.ViewHolder>(DiffItemCallback()) {
 
     private var TYPE_NORMAL = 0
@@ -25,14 +26,14 @@ class TourAdapter(var activity: Activity,private val itemClick: (TourItem) -> Un
     //是否顯示Footer
     private var showFooter: Boolean = true
 
-    inner class AttractionAdapterViewHolder( var binding: RvMainItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    inner class AttractionAdapterViewHolder(var binding: RvMainItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         @SuppressLint("CheckResult", "SetTextI18n")
         fun bind(model: TourItem) {
 
-            binding.attractionName.text = model.name ?: activity.getString(R.string.attraction)
+            binding.attractionName.text = model.name ?: activity?.getString(R.string.attraction)
 
-            binding.attractionDescription.text = model.introduction ?: activity.getString(R.string.attraction_introduction)
+            binding.attractionDescription.text = model.introduction ?: activity?.getString(R.string.attraction_introduction)
 
             //image
             if (model.images.isNotEmpty() && model.images.get(0) != null) {
@@ -60,11 +61,7 @@ class TourAdapter(var activity: Activity,private val itemClick: (TourItem) -> Un
 
         fun bind() {
 
-            if (!showFooter) {
-
-                binding.tvLoading.visibility = View.GONE
-
-            }
+            binding.tvLoading.visibility = if (!showFooter) View.GONE else View.VISIBLE
 
         }
 

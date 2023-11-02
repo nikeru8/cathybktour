@@ -53,6 +53,13 @@ class MainActivityViewModel @Inject constructor(
 
     val changeLanguageStatus = MutableLiveData(false)
 
+
+    private val _selectedTabIndex = MutableLiveData(0)  // 默認選中第一個tab
+    val selectedTabIndex: LiveData<Int> get() = _selectedTabIndex
+    fun switchTab(index: Int) {
+        _selectedTabIndex.value = index
+    }
+
     fun callApiTaipeiTour(language: Language?, currentPage: Int?) {
 
         viewModelScope.launch {

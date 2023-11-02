@@ -1,6 +1,7 @@
 package com.daniel.cathybktour.utils
 
 import android.util.Log
+import com.daniel.cathybktour.R
 import com.daniel.cathybktour.api.TaipeiTourService
 import com.daniel.cathybktour.model.Language
 import com.daniel.cathybktour.repository.MainActivityRepository
@@ -103,6 +104,24 @@ class AppModule {
     @Singleton
     fun provideTaipeiTourService(retrofit: Retrofit): TaipeiTourService {
         return retrofit.create(TaipeiTourService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun getTabIconsNormal(): IntArray {
+        return intArrayOf(
+            R.drawable.tab_home_n,
+            R.drawable.tab_explore_n
+        )
+    }
+
+    @Provides
+    @Singleton
+    fun getTabIconsSelected (): IntArray {
+        return intArrayOf(
+            R.drawable.tab_home_s,
+            R.drawable.tab_explore_s
+        )
     }
 
 }
