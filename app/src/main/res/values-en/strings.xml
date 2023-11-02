@@ -10,4 +10,10 @@
     <string name="web_address">Website: %s</string>
     <string name="server_error">Language selection server error, please try again later.</string>
     <string name="can_not_load_page">Unable to load the page, please try again later</string>
+    <string name="attraction">Attraction</string>
+    <string name="attraction_introduction">Attraction Introduction</string>
+    <array name="tab_main">
+        <item>Home</item>
+        <item>Explore</item>
+    </array>
 </resources>

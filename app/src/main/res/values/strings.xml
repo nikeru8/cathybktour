@@ -17,5 +17,6 @@
         <item>首頁</item>
         <item>探索</item>
     </array>
+    <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">your key</string>
 
 </resources>

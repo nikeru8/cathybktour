@@ -10,4 +10,10 @@
     <string name="web_address">ウェブサイト: %s</string>
     <string name="server_error">言語選択サーバーエラー、後でもう一度お試しください。</string>
     <string name="can_not_load_page">ページを読み込めません、後でもう一度お試しください。</string>
+    <string name="attraction">観光名所</string>
+    <string name="attraction_introduction">観光名所紹介</string>
+    <array name="tab_main">
+        <item>ホーム</item>
+        <item>探索</item>
+    </array>
 </resources>

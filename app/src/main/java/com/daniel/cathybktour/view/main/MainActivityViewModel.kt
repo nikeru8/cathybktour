@@ -17,10 +17,7 @@ import javax.inject.Inject
 //@Inject 此處的 repository 依賴需要 Hilt 進行注入。Hilt 會在建構這個 ViewModel 的時候，自動提供一個 MainActivityRepository 的實例給它。
 // 這裡注入語言列表
 @HiltViewModel //表示該 ViewModel 要使用 Hilt 來注入其依賴。因為是viewModel生命週期有所不同，需要使用到HitViewModel
-class MainActivityViewModel @Inject constructor(
-    private val repository: MainActivityRepository,
-    val languages: List<Language>,
-) : ViewModel() {
+class MainActivityViewModel @Inject constructor(private val repository: MainActivityRepository, val languages: List<Language>, ) : ViewModel() {
 
     private val TAG = MainActivityViewModel::class.java.simpleName
 

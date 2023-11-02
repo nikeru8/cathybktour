@@ -10,5 +10,10 @@
     <string name="web_address">เว็บไซต์: %s</string>
     <string name="server_error">เกิดข้อผิดพลาดในเซิร์ฟเวอร์การเลือกภาษา โปรดลองอีกครั้งในภายหลัง</string>
     <string name="can_not_load_page">ไม่สามารถโหลดหน้าเว็บได้ โปรดลองอีกครั้งในภายหลัง</string>
-
+    <string name="attraction">สถานที่ท่องเที่ยว</string>
+    <string name="attraction_introduction">คำนำสถานที่ท่องเที่ยว</string>
+    <array name="tab_main">
+        <item>หน้าหลัก</item>
+        <item>สำรวจ</item>
+    </array>
 </resources>

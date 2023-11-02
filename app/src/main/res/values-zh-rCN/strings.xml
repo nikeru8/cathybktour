@@ -3,11 +3,17 @@
     <string name="attractions_title"> 台北市景点 %s/%s</string>
     <string name="app_title">悠游台北</string>
     <string name="selected_language">选择语言</string>
-    <string name="loading_please_wait">读取中...</string>
+    <string name="loading_please_wait">加载中...</string>
     <string name="open_time">营业时间: %s</string>
     <string name="address">地址: %s</string>
     <string name="mobile">联系电话: %s</string>
     <string name="web_address">网址: %s</string>
     <string name="server_error">选择语言服务器异常，请稍后再试。</string>
     <string name="can_not_load_page">无法载入网页，请之后再尝试</string>
+    <string name="attraction">景点</string>
+    <string name="attraction_introduction">景点介绍</string>
+    <array name="tab_main">
+        <item>首页</item>
+        <item>探索</item>
+    </array>
 </resources>

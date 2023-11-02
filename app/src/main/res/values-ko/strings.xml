@@ -10,4 +10,10 @@
     <string name="web_address">웹사이트: %s</string>
     <string name="server_error">언어 선택 서버 오류, 나중에 다시 시도하세요.</string>
     <string name="can_not_load_page">페이지를 불러올 수 없습니다, 나중에 다시 시도하세요.</string>
+    <string name="attraction">명소</string>
+    <string name="attraction_introduction">명소 소개</string>
+    <array name="tab_main">
+        <item>홈</item>
+        <item>탐색</item>
+    </array>
 </resources>

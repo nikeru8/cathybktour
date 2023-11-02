@@ -10,5 +10,12 @@
     <string name="web_address">Sitio web: %s</string>
     <string name="server_error">Error en el servidor de selección de idioma, por favor inténtelo de nuevo más tarde.</string>
     <string name="can_not_load_page">No se puede cargar la página, inténtelo de nuevo más tarde.</string>
+    <string name="attraction">Atracción</string>
+    <string name="attraction_introduction">Introducción a la atracción</string>
+    <array name="tab_main">
+        <item>Inicio</item>
+        <item>Explorar</item>
+    </array>
+    <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">AIzaSyBvTvpm50ECvPYcZi5k5JjD_mpPLfonOEg</string>
 
 </resources>

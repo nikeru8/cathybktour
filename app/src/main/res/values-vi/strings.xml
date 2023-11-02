@@ -10,4 +10,10 @@
     <string name="web_address">Trang web: %s</string>
     <string name="server_error">Lỗi máy chọn ngôn ngữ, vui lòng thử lại sau.</string>
     <string name="can_not_load_page">Không thể tải trang web, vui lòng thử lại sau</string>
+    <string name="attraction">Điểm du lịch</string>
+    <string name="attraction_introduction">Giới thiệu điểm du lịch</string>
+    <array name="tab_main">
+        <item>Trang chủ</item>
+        <item>Khám phá</item>
+    </array>
 </resources>

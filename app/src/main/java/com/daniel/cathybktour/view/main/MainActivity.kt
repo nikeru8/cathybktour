@@ -168,7 +168,7 @@ class MainActivity : AppCompatActivity(), FragNavController.TransactionListener,
             }
 
             //fragment切換時的狀態
-            fragmentHideStrategy = FragNavController.DETACH
+            fragmentHideStrategy = FragNavController.HIDE
 
             //navigation策略
             navigationStrategy = UniqueTabHistoryStrategy(object : FragNavSwitchController {

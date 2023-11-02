@@ -6,8 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.daniel.cathybktour.R
 import com.daniel.cathybktour.databinding.FragmentExploreBinding
 import com.daniel.cathybktour.utils.viewBinding
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+
 
 class ExploreFragment : Fragment() {
 
@@ -23,6 +28,18 @@ class ExploreFragment : Fragment() {
         val view = binding.root
 
         initView()
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+
+        mapFragment.getMapAsync { googleMap ->
+
+            googleMap.moveCamera(
+                CameraUpdateFactory.newLatLngZoom(
+                    LatLng(25.0330, 121.5654),
+                    15.0f
+                )
+            )
+
+        }
 
         return view
 
