@@ -1,6 +1,10 @@
 # cathybktour
 
 Youtube連結
+Done - version
+https://youtu.be/4qz_Q9_ezGA
+
+探索version
 https://youtu.be/Aps3nICK5N4?si=-1jtyqWsjkxC1yip
 
 using - 
