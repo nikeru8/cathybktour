@@ -177,6 +177,11 @@ class HomeFragment : Fragment() {
         viewModel.currentLanguage.observe(viewLifecycleOwner) { language ->
 
             viewModel.changeLanguageStatus.value = true
+
+            val config = Configuration()
+            config.setLocale(viewModel.getLocale(language))
+            resources.updateConfiguration(config, resources.displayMetrics)
+
             // 更新 UI
             initView()
             viewModel.callApiTaipeiTour(language = language, viewModel.currentPage.value)//init call api && selected language call api

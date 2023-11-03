@@ -16,5 +16,4 @@
         <item>Home</item>
         <item>Explore</item>
     </array>
-    <string name="location_permission_denied">This sample requires location permission to enable the \'my location\' layer. Please try again and grant access to use the location.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Google Maps API Demos\'.</string>
 </resources>

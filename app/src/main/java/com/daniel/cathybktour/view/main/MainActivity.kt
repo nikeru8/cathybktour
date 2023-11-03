@@ -1,22 +1,19 @@
 package com.daniel.cathybktour.view.main
 
-import android.content.res.Configuration
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.Log
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.core.view.size
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.daniel.cathybktour.R
 import com.daniel.cathybktour.databinding.ActivityMainBinding
 import com.daniel.cathybktour.databinding.TabItemBinding
 import com.daniel.cathybktour.utils.Utils
+import com.daniel.cathybktour.view.adapter.TourAdapter
 import com.google.android.material.tabs.TabLayout
 import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavLogger
@@ -54,8 +51,6 @@ class MainActivity : AppCompatActivity(), FragNavController.TransactionListener,
 
     )
 
-    var isExit = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).apply {
@@ -65,6 +60,7 @@ class MainActivity : AppCompatActivity(), FragNavController.TransactionListener,
 
         }
 
+        initTab()
         initFragment(savedInstanceState)
         initObserver()
 
@@ -75,16 +71,6 @@ class MainActivity : AppCompatActivity(), FragNavController.TransactionListener,
         viewModel.selectedTabIndex.observe(this) { tabIndex ->
 
             mNavController.switchTab(tabIndex)
-
-        }
-
-        //更改語言後判斷
-        viewModel.currentLanguage.observe(this) { language ->
-
-            val config = Configuration()
-            config.setLocale(viewModel.getLocale(language))
-            resources.updateConfiguration(config, resources.displayMetrics)
-            initTab()
 
         }
 
@@ -115,12 +101,6 @@ class MainActivity : AppCompatActivity(), FragNavController.TransactionListener,
     }
 
     private fun initTab() {
-
-        if (binding.bottomTabLayout.size > 0) {
-
-            binding.bottomTabLayout.removeAllTabs()
-
-        }
 
         tabs = resources.getStringArray(R.array.tab_main)
         for (i in tabs.indices) {
@@ -253,28 +233,4 @@ class MainActivity : AppCompatActivity(), FragNavController.TransactionListener,
 
     }
 
-    override fun onBackPressed() {
-
-        if (mNavController.popFragment().not()) {
-
-            if (!isExit) {
-
-                isExit = true
-                Toast.makeText(this, "確定要離開app嗎", Toast.LENGTH_SHORT).show()
-
-            } else {
-
-                super.onBackPressed()
-
-            }
-
-            Handler(Looper.myLooper()!!).postDelayed({ isExit = false }, 2000)
-
-        }
-
-    }
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        // 其他Activity的處理代碼...
-    }
 }
