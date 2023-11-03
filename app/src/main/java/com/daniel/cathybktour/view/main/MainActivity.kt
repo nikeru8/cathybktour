@@ -1,5 +1,6 @@
 package com.daniel.cathybktour.view.main
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.widget.ImageView
@@ -8,12 +9,11 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.daniel.cathybktour.R
 import com.daniel.cathybktour.databinding.ActivityMainBinding
 import com.daniel.cathybktour.databinding.TabItemBinding
 import com.daniel.cathybktour.utils.Utils
-import com.daniel.cathybktour.view.adapter.TourAdapter
+import com.daniel.cathybktour.view.main.viewModel.MainActivityViewModel
 import com.google.android.material.tabs.TabLayout
 import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavLogger
@@ -74,6 +74,16 @@ class MainActivity : AppCompatActivity(), FragNavController.TransactionListener,
 
         }
 
+        viewModel.currentLanguage.observe(this) { language ->
+
+            val config = Configuration()
+            config.setLocale(viewModel.getLocale(language))
+            resources.updateConfiguration(config, resources.displayMetrics)
+
+            initTab()
+
+        }
+
     }
 
     override fun getRootFragment(index: Int): Fragment {
@@ -102,6 +112,12 @@ class MainActivity : AppCompatActivity(), FragNavController.TransactionListener,
 
     private fun initTab() {
 
+        if (binding.bottomTabLayout.tabCount > 0) {
+
+            binding.bottomTabLayout.removeAllTabs()
+
+        }
+
         tabs = resources.getStringArray(R.array.tab_main)
         for (i in tabs.indices) {
             val tab = binding.bottomTabLayout.newTab()
@@ -116,15 +132,15 @@ class MainActivity : AppCompatActivity(), FragNavController.TransactionListener,
                 icon.setImageResource(mTabIconsSelected[i])
                 val laParams = icon.layoutParams
                 laParams?.let {
-                    it.height = Utils.dp2pixel(this@MainActivity, 35)
-                    it.width = Utils.dp2pixel(this@MainActivity, 35)
+                    it.height = Utils.dp2pixel(this@MainActivity, 30)
+                    it.width = Utils.dp2pixel(this@MainActivity, 30)
                     icon.layoutParams = it
                 }
             } else {
                 val laParams = icon.layoutParams
                 laParams?.let {
-                    it.height = Utils.dp2pixel(this@MainActivity, 29)
-                    it.width = Utils.dp2pixel(this@MainActivity, 29)
+                    it.height = Utils.dp2pixel(this@MainActivity, 30)
+                    it.width = Utils.dp2pixel(this@MainActivity, 30)
                     icon.layoutParams = it
                 }
                 icon.setImageResource(mTabIconsNormal[i])

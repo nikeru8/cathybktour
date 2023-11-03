@@ -15,4 +15,13 @@ interface TaipeiTourService {
         @Query("page") page: Int?
     ): Response<TourModel>
 
+    @Headers("accept: application/json")
+    @GET("open-api/{language}/Attractions/All")
+    suspend fun getAttractionsNearBy(
+        @Path("language") language: String?,
+        @Query("page") page: Int?,
+        @Query("nlat") nlat: Double?,
+        @Query("elong") elong: Double?
+    ): Response<TourModel>
+
 }

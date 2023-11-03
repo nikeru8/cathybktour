@@ -7,7 +7,7 @@
 
         <variable
             name="main_view_model"
-            type="com.daniel.cathybktour.view.main.MainActivityViewModel" />
+            type="com.daniel.cathybktour.view.main.viewModel.MainActivityViewModel" />
 
     </data>
 
@@ -54,7 +54,7 @@
             android:id="@+id/bottom_tab_layout"
             style="@style/MainTabStyle"
             android:layout_width="0dp"
-            android:layout_height="70dp"
+            android:layout_height="60dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

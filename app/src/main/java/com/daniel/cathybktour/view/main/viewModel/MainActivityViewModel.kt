@@ -1,4 +1,4 @@
-package com.daniel.cathybktour.view.main
+package com.daniel.cathybktour.view.main.viewModel
 
 import android.util.Log
 import androidx.lifecycle.LiveData

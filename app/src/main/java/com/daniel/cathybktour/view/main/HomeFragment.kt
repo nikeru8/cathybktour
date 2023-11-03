@@ -20,6 +20,7 @@ import com.daniel.cathybktour.model.Language
 import com.daniel.cathybktour.utils.viewBinding
 import com.daniel.cathybktour.view.adapter.LanguageAdapter
 import com.daniel.cathybktour.view.adapter.TourAdapter
+import com.daniel.cathybktour.view.main.viewModel.MainActivityViewModel
 import com.jakewharton.rxbinding2.view.clicks
 import java.util.concurrent.TimeUnit
 
@@ -39,7 +40,7 @@ class HomeFragment : Fragment() {
         val view = binding.root
         initView()
         initData()
-        Log.d("TAG", "sssss onCreateView")
+
         return view
 
     }
@@ -178,10 +179,6 @@ class HomeFragment : Fragment() {
 
             viewModel.changeLanguageStatus.value = true
 
-            val config = Configuration()
-            config.setLocale(viewModel.getLocale(language))
-            resources.updateConfiguration(config, resources.displayMetrics)
-
             // 更新 UI
             initView()
             viewModel.callApiTaipeiTour(language = language, viewModel.currentPage.value)//init call api && selected language call api
@@ -206,7 +203,7 @@ class HomeFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        Log.d("TAG", "sssss onActivityCreated")
+
         initListener()
         initObserver()
 

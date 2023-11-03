@@ -4,6 +4,7 @@ import android.util.Log
 import com.daniel.cathybktour.R
 import com.daniel.cathybktour.api.TaipeiTourService
 import com.daniel.cathybktour.model.Language
+import com.daniel.cathybktour.repository.ExploreFragmentRepository
 import com.daniel.cathybktour.repository.MainActivityRepository
 import dagger.Module
 import dagger.Provides
@@ -28,6 +29,12 @@ class AppModule {
     @Singleton
     fun provideMainActivityRepository(taipeiTourService: TaipeiTourService): MainActivityRepository {
         return MainActivityRepository(taipeiTourService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideExploreRepository(taipeiTourService: TaipeiTourService): ExploreFragmentRepository {
+        return ExploreFragmentRepository(taipeiTourService)
     }
 
     class LogJsonInterceptor : Interceptor {
@@ -105,6 +112,8 @@ class AppModule {
     fun provideTaipeiTourService(retrofit: Retrofit): TaipeiTourService {
         return retrofit.create(TaipeiTourService::class.java)
     }
+
+
 
     @Provides
     @Singleton
