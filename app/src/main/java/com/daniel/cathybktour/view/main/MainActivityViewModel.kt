@@ -48,6 +48,7 @@ class MainActivityViewModel @Inject constructor(private val repository: MainActi
 
     val taipeiTourData: MutableLiveData<TourModel?> = MutableLiveData()
 
+    //用於判斷是否切換語言，如果是切換語言的狀態下，adapter的更新資料方式會有所不同
     val changeLanguageStatus = MutableLiveData(false)
 
 
@@ -110,7 +111,7 @@ class MainActivityViewModel @Inject constructor(private val repository: MainActi
         language.isSelected = true
 
         _currentPage.value = 1 // 每當語言更改時，將頁碼重置為1
-        _currentLanguage.value = language //更改當前語言
+        _currentLanguage.value = language//更改當前語言
 
     }
 
