@@ -2,9 +2,11 @@ package com.daniel.cathybktour.view.main
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -17,7 +19,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.daniel.cathybktour.R
+import com.daniel.cathybktour.api.TourItem
 import com.daniel.cathybktour.databinding.FragmentExploreBinding
+import com.daniel.cathybktour.model.TourClusterItem
 import com.daniel.cathybktour.utils.PermissionUtils
 import com.daniel.cathybktour.utils.viewBinding
 import com.daniel.cathybktour.view.main.viewModel.ExploreFragmentViewModel
@@ -27,13 +31,25 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.maps.android.clustering.Cluster
+import com.google.maps.android.clustering.ClusterManager
+import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm
+import com.google.maps.android.clustering.view.DefaultClusterRenderer
 import com.jakewharton.rxbinding2.view.clicks
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.concurrent.TimeUnit
 
+
 @AndroidEntryPoint
-class ExploreFragment : Fragment() {
+class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourClusterItem>,
+    ClusterManager.OnClusterItemClickListener<TourClusterItem>, ClusterManager.OnClusterInfoWindowClickListener<TourClusterItem> {
 
     private val TAG = ExploreFragment::class.java.simpleName
     private val binding by viewBinding<FragmentExploreBinding>()
@@ -52,6 +68,12 @@ class ExploreFragment : Fragment() {
 
     //確保api只被call一次
     private var hasCalledApi = false
+
+    private var clusterManager: ClusterManager<TourClusterItem>? = null
+    lateinit var clusterRenderer: HospitalRenderer
+    private lateinit var previousItem: TourClusterItem
+    private val mAllTypeList = mutableListOf<TourItem>()
+
 
     companion object {
 
@@ -72,11 +94,20 @@ class ExploreFragment : Fragment() {
 
     }
 
-    private fun initObserver(frome: String) {
+    private fun initObserver() {
 
-        viewModel.taipeiTourData.observe(viewLifecycleOwner) { model ->
+        viewModel.taipeiTourData.observe(viewLifecycleOwner) { tourModel ->
 
-            Log.d(TAG, "checkpoint model - ${model}")
+            if (tourModel?.data != null)
+                for (item in tourModel.data) {
+
+                    item.let { item ->
+                        mAllTypeList.add(item)
+                    }
+
+                }
+
+            setUpClusterer()
 
         }
 
@@ -103,8 +134,8 @@ class ExploreFragment : Fragment() {
 
         mapFragment.getMapAsync { googleMap ->
             mMap = googleMap
-            updateLocationUI("initData() MapOnReady")
-            initObserver("onViewCreated")
+            updateLocationUI()
+            initObserver()
         }
 
     }
@@ -123,7 +154,7 @@ class ExploreFragment : Fragment() {
 
 
     @SuppressLint("MissingPermission")
-    private fun updateLocationUI(from: String) {
+    private fun updateLocationUI() {
         Log.d(TAG, "initObserver ssss updateLocationUI")
         if (mMap == null) {
 
@@ -267,6 +298,139 @@ class ExploreFragment : Fragment() {
 
     }
 
+    //設置聚合功能
+    @SuppressLint("PotentialBehaviorOverride")
+    private fun setUpClusterer() {
+
+        clusterManager = ClusterManager(requireActivity(), mMap)
+        clusterRenderer = HospitalRenderer(requireActivity())
+        clusterRenderer.minClusterSize = 3
+        clusterManager!!.renderer = clusterRenderer
+
+        val metrics = DisplayMetrics()
+
+        activity?.windowManager?.defaultDisplay?.getMetrics(metrics)
+        clusterManager!!.setAlgorithm(
+            NonHierarchicalViewBasedAlgorithm(
+                metrics.widthPixels, metrics.heightPixels
+            )
+        )
+
+        clusterManager!!.setOnClusterClickListener(this)
+        clusterManager!!.setOnClusterItemClickListener(this)
+
+        mMap.setOnCameraIdleListener(clusterManager)
+        mMap.setOnMarkerClickListener(clusterManager)
+
+
+        mMap.setOnCameraMoveStartedListener { reason ->
+            // 1 移動 使用者手勢
+            // 2 使用者點擊螢幕
+            // 3 動畫
+
+        }
+
+        for (item in mAllTypeList) {
+
+            val tempItem = TourClusterItem(item)
+            clusterManager!!.addItem(tempItem)
+
+        }
+
+        clusterManager!!.setAnimation(false)
+        clusterManager!!.cluster()
+
+    }
+
+    inner class HospitalRenderer(var activity: Activity) : DefaultClusterRenderer<TourClusterItem>(activity, mMap, clusterManager!!) {
+
+
+        override fun onClusterItemRendered(clusterItem: TourClusterItem, marker: Marker) {
+            super.onClusterItemRendered(clusterItem, marker)
+
+        }
+
+        override fun onBeforeClusterItemRendered(model: TourClusterItem, markerOptions: MarkerOptions) {
+            // Draw a single person - show their profile photo and set the info window to show their
+            //用於判斷種類
+            markerOptions
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.location))
+                .title(model.title)
+
+        }
+
+        //更新item
+        fun setUpdateItem(model: TourClusterItem) {
+
+            try {
+
+                val marker: Marker = getMarker(model)
+                if (marker != null) {
+
+                    clusterManager?.updateItem(model)
+                    clusterManager?.cluster()
+
+                }
+
+            } catch (e: Exception) {
+
+
+            }
+
+
+        }
+
+        //更新選中的Marker
+        fun setUpdateSelectedMarker(model: TourClusterItem) {
+
+            try {
+
+                val marker: Marker = getMarker(model)
+                if (marker != null) {
+
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.pic_selected))
+                    clusterManager?.cluster()
+
+                }
+
+            } catch (e: Exception) {
+
+                Log.e(TAG, "setUpdateMarker get error - ${e.message} , model hospName - ${model.item.name}")
+
+            }
+
+
+        }
+
+        //替換回原本樣子
+        fun reloadMarker(model: TourClusterItem) {
+
+            try {
+
+                val marker: Marker = getMarker(model)
+                if (marker != null) {
+
+                    marker.setIcon(BitmapDescriptorFactory.fromResource(R.drawable.location))
+                    clusterManager?.cluster()
+
+                }
+
+            } catch (e: Exception) {
+
+                Log.e(TAG, "reloadMarker get error - ${e.message}")
+
+            }
+
+
+        }
+
+        override fun onClusterItemUpdated(item: TourClusterItem, marker: Marker) {
+            super.onClusterItemUpdated(item, marker)
+        }
+
+    }
+
+
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             if (permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true &&
@@ -274,12 +438,67 @@ class ExploreFragment : Fragment() {
             ) {
                 // 權限被用戶授予
                 permissionGranted = true
-                updateLocationUI("requestPermissionLauncher")
+                updateLocationUI()
 
             } else {
                 // 權限被用戶拒絕
                 checkPermission()
             }
         }
+
+    override fun onClusterClick(cluster: Cluster<TourClusterItem>?): Boolean {
+
+        val builder = LatLngBounds.builder()
+        for (item in cluster?.items!!) {
+            builder.include(item.position)
+        }
+
+        val bounds = builder.build()
+
+        try {
+            mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return true
+
+    }
+
+    override fun onClusterItemClick(item: TourClusterItem?): Boolean {
+
+        item?.let {
+
+            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(item.item.nlat!!, item.item.elong!!), 18.0f))
+
+
+            val dialog = BottomSheetDialog(requireActivity())
+            dialog.setContentView(R.layout.tour_map_info)
+            val behavior = BottomSheetBehavior.from(dialog.window?.decorView ?: View(requireActivity()))
+            behavior.peekHeight = resources.getDimensionPixelSize(R.dimen.bottom_sheet_peek_height)
+            dialog.show()
+
+            clusterRenderer.setUpdateSelectedMarker(item)
+
+            //更換之前點選的icon
+            if (this::previousItem.isInitialized) {
+                Log.d(TAG, "checkpoint 更換之前點選的icon")
+                clusterRenderer.reloadMarker(previousItem)
+
+            }
+
+            previousItem = item
+            Log.d(TAG, "checkpoint previousItem - $previousItem")
+
+        }
+
+        return true
+    }
+
+    override fun onClusterInfoWindowClick(cluster: Cluster<TourClusterItem>?) {
+        Toast.makeText(activity, "cluster ${cluster?.items?.size}}", Toast.LENGTH_SHORT).show()
+
+    }
 
 }
