@@ -6,6 +6,8 @@ import android.app.Activity
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,6 +26,7 @@ import com.daniel.cathybktour.databinding.FragmentExploreBinding
 import com.daniel.cathybktour.model.TourClusterItem
 import com.daniel.cathybktour.utils.PermissionUtils
 import com.daniel.cathybktour.utils.viewBinding
+import com.daniel.cathybktour.view.Dialog.TourDetailBottomSheet
 import com.daniel.cathybktour.view.main.viewModel.ExploreFragmentViewModel
 import com.daniel.cathybktour.view.main.viewModel.MainActivityViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -36,8 +39,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.maps.android.clustering.Cluster
 import com.google.maps.android.clustering.ClusterManager
 import com.google.maps.android.clustering.algo.NonHierarchicalViewBasedAlgorithm
@@ -96,24 +97,96 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
     private fun initObserver() {
 
+
         viewModel.taipeiTourData.observe(viewLifecycleOwner) { tourModel ->
 
-            if (tourModel?.data != null)
-                for (item in tourModel.data) {
+            if (clusterManager != null)
+                clusterManager?.clearItems()  // 清除所有 items
 
-                    item.let { item ->
-                        mAllTypeList.add(item)
-                    }
-
+            // 添加新的 items
+            tourModel?.data?.let { data ->
+                mAllTypeList.clear()  //清空現有數據
+                mAllTypeList.addAll(data)
+                for (item in data) {
+                    val tourClusterItem = TourClusterItem(item)
+                    clusterManager?.addItem(tourClusterItem)
                 }
+            }
 
-            setUpClusterer()
+            // 在主線程中調用 cluster() 更新地圖
+            Handler(Looper.getMainLooper()).post {
+                clusterManager?.cluster()
+            }
+
+            // 確認這裡是在主線程中操作
+            if (clusterManager == null) {
+                setUpClusterer()  // 只在第一次設定
+            }
+
 
         }
 
         mainActivityViewModel.currentLanguage.observe(viewLifecycleOwner) {
 
             initView()
+            if (lastKnownLocation != null)
+                viewModel.callApiTaipeiTour(
+                    mainActivityViewModel.getSelectedLanguage(),
+                    1,
+                    lastKnownLocation!!.latitude,
+                    lastKnownLocation!!.longitude
+                )
+
+        }
+
+        viewModel.isError.observe(viewLifecycleOwner) { message ->
+
+            Toast.makeText(requireContext(), "explore = $message", Toast.LENGTH_SHORT).show()
+
+        }
+
+        //獲取地圖位置
+        viewModel.locationData.observe(viewLifecycleOwner) { location ->
+
+            lastKnownLocation = location
+            if (lastKnownLocation != null) {
+
+                mMap.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        LatLng(
+                            lastKnownLocation!!.latitude,
+                            lastKnownLocation!!.longitude
+                        ), DEFAULT_ZOOM.toFloat()
+                    )
+                )
+                if (!hasCalledApi) {
+                    //確保api只被call一次
+                    hasCalledApi = true
+                    viewModel.callApiTaipeiTour(
+                        mainActivityViewModel.getSelectedLanguage(),
+                        1,
+                        lastKnownLocation!!.latitude,
+                        lastKnownLocation!!.longitude
+                    )
+                }
+
+            } else {
+
+                Toast.makeText(activity, "請開啟精準定位，才能獲取您的所在位置喔！", Toast.LENGTH_SHORT).show()
+                mMap.moveCamera(
+                    CameraUpdateFactory
+                        .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat())
+                )
+
+            }
+
+        }
+
+        viewModel.locationError.observe(viewLifecycleOwner) { event ->
+
+            event.getContentIfNotHandled()?.let { error ->
+                Toast.makeText(requireActivity(), error, Toast.LENGTH_SHORT).show()
+            }
 
         }
 
@@ -123,13 +196,13 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
     private fun initView() {
 
         binding.toolbar.tvToolbarTitle.text = resources.getStringArray(R.array.tab_main)[1]
-        binding.toolbar.ivBack.visibility = View.GONE
+        binding.toolbar.ivBack.visibility = View.INVISIBLE
 
     }
 
     private fun initData() {
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
 
         mapFragment.getMapAsync { googleMap ->
@@ -146,7 +219,7 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
         binding.ivMyLocation.clicks().throttleFirst(1000, TimeUnit.MILLISECONDS).subscribe {
 
             checkPermission()
-            getDeviceLocation()
+            viewModel.getDeviceLocation(fusedLocationProviderClient)
 
         }
 
@@ -155,7 +228,7 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
     @SuppressLint("MissingPermission")
     private fun updateLocationUI() {
-        Log.d(TAG, "initObserver ssss updateLocationUI")
+
         if (mMap == null) {
 
             return
@@ -163,13 +236,13 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
         try {
             if (permissionGranted) {
-                Log.d(TAG, "initObserver ssss permissionGranted")
+
                 mMap.isMyLocationEnabled = true
                 mMap.uiSettings.isMyLocationButtonEnabled = true
                 getDeviceLocation()
 
             } else {
-                Log.d(TAG, "initObserver ssss permissionGranted !!")
+
                 mMap.isMyLocationEnabled = false
                 mMap.uiSettings.isMyLocationButtonEnabled = false
                 lastKnownLocation = null
@@ -186,42 +259,30 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
     @SuppressLint("MissingPermission")
     private fun checkPermission() {
-
         //  1. 檢查是否已授予權限，如果已授予，則啟用我的位置圖層
-        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-            ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
-        ) {
-
+        if (hasLocationPermission()) {
             permissionGranted = true
             mMap.isMyLocationEnabled = true
             getDeviceLocation()
             return
-
         }
 
         // 2. 應顯示權限說明對話框
-        if (ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION) ||
-            ActivityCompat.shouldShowRequestPermissionRationale(requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION)
+        if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) ||
+            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_COARSE_LOCATION)
         ) {
 
-            PermissionUtils.RationaleDialog.newInstance(
-                LOCATION_PERMISSION_REQUEST_CODE, true
-            ).show(childFragmentManager, "dialog")
-
+            PermissionUtils.RationaleDialog.newInstance(LOCATION_PERMISSION_REQUEST_CODE, true)
+                .show(childFragmentManager, "dialog")
             return
-
         }
 
-
+        // 問用戶授權
         requestPermissionLauncher.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
         )
-
-        // [END maps_check_location_permission]
     }
+
 
     private fun getDeviceLocation() {
 
@@ -302,7 +363,7 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
     @SuppressLint("PotentialBehaviorOverride")
     private fun setUpClusterer() {
 
-        clusterManager = ClusterManager(requireActivity(), mMap)
+        clusterManager = ClusterManager(requireContext(), mMap)
         clusterRenderer = HospitalRenderer(requireActivity())
         clusterRenderer.minClusterSize = 3
         clusterManager!!.renderer = clusterRenderer
@@ -472,24 +533,19 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(LatLng(item.item.nlat!!, item.item.elong!!), 18.0f))
 
-
-            val dialog = BottomSheetDialog(requireActivity())
-            dialog.setContentView(R.layout.tour_map_info)
-            val behavior = BottomSheetBehavior.from(dialog.window?.decorView ?: View(requireActivity()))
-            behavior.peekHeight = resources.getDimensionPixelSize(R.dimen.bottom_sheet_peek_height)
-            dialog.show()
+            val tourDetailBottomSheet = TourDetailBottomSheet.newInstance(item.item)
+            tourDetailBottomSheet.show(requireActivity().supportFragmentManager, "tour_detail")
 
             clusterRenderer.setUpdateSelectedMarker(item)
 
             //更換之前點選的icon
-            if (this::previousItem.isInitialized) {
-                Log.d(TAG, "checkpoint 更換之前點選的icon")
+            if (this::previousItem.isInitialized && previousItem.position != item.position) {
+
                 clusterRenderer.reloadMarker(previousItem)
 
             }
 
             previousItem = item
-            Log.d(TAG, "checkpoint previousItem - $previousItem")
 
         }
 
@@ -501,4 +557,14 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
     }
 
+    override fun onDestroy() {
+        clusterRenderer.onRemove()
+        clusterManager = null
+        super.onDestroy()
+    }
+
+    private fun hasLocationPermission(): Boolean {
+        return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+    }
 }

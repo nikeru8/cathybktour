@@ -13,7 +13,11 @@
     <string name="attraction">Attraction</string>
     <string name="attraction_introduction">Attraction Introduction</string>
     <array name="tab_main">
-        <item>Home</item>
-        <item>Explore</item>
+        <item>Taipei</item>
+        <item>Nearby</item>
     </array>
+    <string name="permission_rationale_location">This sample requires location permission to enable the \'my location\' layer. Please try again and grant access to use the location.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Google Maps API Demos\'.</string>
+    <string name="location_permission_denied">This sample requires location permission to enable the \'my location\' layer. Please try again and grant access to use the location.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Google Maps API Demos\'.</string>
+    <string name="permission_required_toast">Location permission not granted, some features will be restricted.</string>
+    <string name="guild_there">Navigate to me: %s</string>
 </resources>

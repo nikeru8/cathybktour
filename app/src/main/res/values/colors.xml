@@ -11,7 +11,7 @@
     <color name="description">#6C6C6C</color>
     <color name="style_full_screen_dialog_bg">#99000000</color>
     <color name="press_blue">#005AB5</color>
-    <color name="_8e8e8e">#8E8E8E</color>
+    <color name="gray_8e8e8e">#8E8E8E</color>
     <color name="blue_aaccff">#AACCFF</color>
     <color name="gray_80FFFFFF">#80FFFFFF</color>
 </resources>

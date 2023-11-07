@@ -1,19 +1,23 @@
 <resources>
-    <string name="app_name">สำรวจไทเป</string>
-    <string name="attractions_title"> สถานที่ท่องเที่ยวในไทเป %s/%s</string>
-    <string name="app_title">สำรวจไทเป</string>
+    <string name="app_name">ค้นพบไทเป</string>
+    <string name="attractions_title">สถานที่ท่องเที่ยวในไทเป %s/%s</string>
+    <string name="app_title">ค้นพบไทเป</string>
     <string name="selected_language">เลือกภาษา</string>
     <string name="loading_please_wait">กำลังโหลด...</string>
-    <string name="open_time">เวลาเปิดทำการ: %s</string>
+    <string name="open_time">เวลาเปิด: %s</string>
     <string name="address">ที่อยู่: %s</string>
     <string name="mobile">เบอร์ติดต่อ: %s</string>
     <string name="web_address">เว็บไซต์: %s</string>
-    <string name="server_error">เกิดข้อผิดพลาดในเซิร์ฟเวอร์การเลือกภาษา โปรดลองอีกครั้งในภายหลัง</string>
-    <string name="can_not_load_page">ไม่สามารถโหลดหน้าเว็บได้ โปรดลองอีกครั้งในภายหลัง</string>
+    <string name="server_error">ข้อผิดพลาดในเซิร์ฟเวอร์เลือกภาษา โปรดลองอีกครั้งในภายหลัง</string>
+    <string name="can_not_load_page">ไม่สามารถโหลดหน้าเว็บ โปรดลองใหม่ภายหลัง</string>
     <string name="attraction">สถานที่ท่องเที่ยว</string>
-    <string name="attraction_introduction">คำนำสถานที่ท่องเที่ยว</string>
+    <string name="attraction_introduction">แนะนำสถานที่ท่องเที่ยว</string>
     <array name="tab_main">
-        <item>หน้าหลัก</item>
-        <item>สำรวจ</item>
+        <item>ไทเป</item>
+        <item>ใกล้ๆ</item>
     </array>
+    <string name="permission_rationale_location">แอปนี้ต้องการสิทธิ์การเข้าถึงตำแหน่งเพื่อเปิดใช้งานคุณลักษณะ \'ตำแหน่งของฉัน\' โปรดลองอีกครั้งและให้สิทธิ์การเข้าถึงเพื่อใช้งานตำแหน่ง\nหากสิทธิ์ถูกปฏิเสธถาวรคุณสามารถเปิดใช้งานจากการตั้งค่าระบบ &gt; แอป &gt; \'Google Maps API Demos\'.</string>
+    <string name="location_permission_denied">ตัวอย่างนี้ต้องการสิทธิ์การเข้าถึงตำแหน่งเพื่อเปิดใช้งานชั้น \'ตำแหน่งของฉัน\' โปรดลองอีกครั้งและให้สิทธิ์การเข้าถึงเพื่อใช้งานตำแหน่ง\nหากสิทธิ์ถูกปฏิเสธถาวรคุณสามารถเปิดใช้งานจากการตั้งค่าระบบ &gt; แอป &gt; \'Google Maps API Demos\'.</string>
+    <string name="permission_required_toast">ไม่ได้ให้สิทธิ์การเข้าถึงตำแหน่ง บางคุณลักษณะจะถูก จำกัด.</string>
+    <string name="guild_there">นำทางมาที่นี่: %s</string>
 </resources>

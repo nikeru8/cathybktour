@@ -24,7 +24,7 @@ object PermissionUtils {
      */
     fun requestLocationPermissions(
         activity: AppCompatActivity, requestId: Int,
-        finishActivity: Boolean
+        finishActivity: Boolean,
     ) {
         if (
             ActivityCompat.shouldShowRequestPermissionRationale(
@@ -61,7 +61,7 @@ object PermissionUtils {
     @JvmStatic
     fun isPermissionGranted(
         grantPermissions: Array<String>, grantResults: IntArray,
-        permission: String
+        permission: String,
     ): Boolean {
         for (i in grantPermissions.indices) {
             if (permission == grantPermissions[i]) {
@@ -179,7 +179,7 @@ object PermissionUtils {
              */
             fun newInstance(
                 requestCode: Int,
-                finishActivity: Boolean
+                finishActivity: Boolean,
             ): RationaleDialog {
                 val arguments = Bundle().apply {
                     putInt(ARGUMENT_PERMISSION_REQUEST_CODE, requestCode)

@@ -191,7 +191,7 @@ class HomeFragment : Fragment() {
     private fun initListener() {
 
         binding.toolbar.llToolbarFeatures.clicks().throttleFirst(1000, TimeUnit.MILLISECONDS).subscribe {
-            showLanguageDialog(requireActivity()) { selectedLanguage ->
+            showLanguageDialog(requireContext()) { selectedLanguage ->
 
                 viewModel.updateLanguage(selectedLanguage)
 

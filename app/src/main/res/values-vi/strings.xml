@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Khám phá Đài Bắc</string>
-    <string name="attractions_title"> Điểm du lịch tại Đài Bắc %s/%s</string>
+    <string name="attractions_title">Điểm du lịch tại Đài Bắc %s/%s</string>
     <string name="app_title">Khám phá Đài Bắc</string>
     <string name="selected_language">Chọn ngôn ngữ</string>
     <string name="loading_please_wait">Đang tải...</string>
@@ -9,11 +9,15 @@
     <string name="mobile">Số điện thoại liên hệ: %s</string>
     <string name="web_address">Trang web: %s</string>
     <string name="server_error">Lỗi máy chọn ngôn ngữ, vui lòng thử lại sau.</string>
-    <string name="can_not_load_page">Không thể tải trang web, vui lòng thử lại sau</string>
+    <string name="can_not_load_page">Không thể tải trang web, vui lòng thử lại sau.</string>
     <string name="attraction">Điểm du lịch</string>
     <string name="attraction_introduction">Giới thiệu điểm du lịch</string>
     <array name="tab_main">
-        <item>Trang chủ</item>
-        <item>Khám phá</item>
+        <item>Đài Bắc</item>
+        <item>Gần đây</item>
     </array>
+    <string name="permission_rationale_location">Cần quyền truy cập vị trí của bạn để kích hoạt lớp "vị trí của tôi", thiếu quyền truy cập sẽ hạn chế một số tính năng.</string>
+    <string name="location_permission_denied">Mẫu này yêu cầu quyền truy cập vị trí để kích hoạt lớp "vị trí của tôi". Vui lòng thử lại và cấp quyền truy cập để sử dụng vị trí.\nNếu quyền truy cập đã bị từ chối vĩnh viễn, bạn có thể bật chúng từ Cài đặt hệ thống &gt; Ứng dụng &gt; "Google Maps API Demos".</string>
+    <string name="permission_required_toast">Không cấp quyền truy cập vị trí, một số tính năng sẽ bị hạn chế.</string>
+    <string name="guild_there">Chỉ đường đến đây: %s</string>
 </resources>

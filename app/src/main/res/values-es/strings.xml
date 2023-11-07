@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Explora Taipéi</string>
-    <string name="attractions_title"> Atracciones de Taipéi %s/%s</string>
+    <string name="attractions_title">Atracciones de Taipéi %s/%s</string>
     <string name="app_title">Explora Taipéi</string>
     <string name="selected_language">Seleccionar idioma</string>
     <string name="loading_please_wait">Cargando...</string>
@@ -9,13 +9,15 @@
     <string name="mobile">Número de contacto: %s</string>
     <string name="web_address">Sitio web: %s</string>
     <string name="server_error">Error en el servidor de selección de idioma, por favor inténtelo de nuevo más tarde.</string>
-    <string name="can_not_load_page">No se puede cargar la página, inténtelo de nuevo más tarde.</string>
+    <string name="can_not_load_page">No se puede cargar la página, inténtelo nuevamente más tarde.</string>
     <string name="attraction">Atracción</string>
     <string name="attraction_introduction">Introducción a la atracción</string>
     <array name="tab_main">
-        <item>Inicio</item>
-        <item>Explorar</item>
+        <item>Taipéi</item>
+        <item>Cerca</item>
     </array>
-    <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">AIzaSyBvTvpm50ECvPYcZi5k5JjD_mpPLfonOEg</string>
-
+    <string name="permission_rationale_location">Para habilitar la capa de mi ubicación, se requiere permiso de ubicación. Inténtelo nuevamente y otorgue acceso para utilizar la ubicación.\nSi el permiso ha sido denegado permanentemente, se puede habilitar desde Configuración del sistema &gt; Aplicaciones &gt; "Google Maps API Demos".</string>
+    <string name="location_permission_denied">Esta muestra requiere permiso de ubicación para habilitar la capa de mi ubicación. Inténtelo nuevamente y otorgue acceso para utilizar la ubicación.\nSi el permiso ha sido denegado permanentemente, se puede habilitar desde Configuración del sistema &gt; Aplicaciones &gt; "Google Maps API Demos".</string>
+    <string name="permission_required_toast">Permiso de ubicación no otorgado, algunas funciones estarán restringidas.</string>
+    <string name="guild_there">Navegar hasta mí: %s</string>
 </resources>

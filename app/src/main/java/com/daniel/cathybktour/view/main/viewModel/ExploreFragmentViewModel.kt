@@ -1,5 +1,7 @@
 package com.daniel.cathybktour.view.main.viewModel
 
+import android.annotation.SuppressLint
+import android.location.Location
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,9 +10,10 @@ import androidx.lifecycle.viewModelScope
 import com.daniel.cathybktour.api.TourModel
 import com.daniel.cathybktour.model.Language
 import com.daniel.cathybktour.repository.ExploreFragmentRepository
+import com.daniel.cathybktour.utils.Event
+import com.google.android.gms.location.FusedLocationProviderClient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
-import java.util.Locale
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,44 +21,24 @@ class ExploreFragmentViewModel @Inject constructor(var repository: ExploreFragme
 
     private val TAG = ExploreFragmentViewModel::class.java.simpleName
 
-    /*
-     * true 可以繼續往下讀取
-     * false 阻擋
-     * */
-    private val _isRvLoading = MutableLiveData(true)
-    val isRvLoading: LiveData<Boolean> get() = _isRvLoading
-    fun setIsRvLoading(value: Boolean) {
-        _isRvLoading.value = value
-    }
-
     private val _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
 
 
-    private val _isError = MutableLiveData(false)
-    val isError: LiveData<Boolean> get() = _isError
+//    // 位置數據 error
+//    private val _locationError = MutableLiveData<Event<String>>()
+//    val locationError: LiveData<Event<String>> get() = _locationError
 
-    // 跟踪當前的頁碼
-    private val _currentPage = MutableLiveData(1)
-
-    val currentPage: MutableLiveData<Int> get() = _currentPage
-
+    private val _isError = MutableLiveData<Event<String>>()
+    val isError: LiveData<Event<String>> get() = _isError
 
     val totalDenominator = MutableLiveData("0")
 
     val taipeiTourData: MutableLiveData<TourModel?> = MutableLiveData()
 
-    val changeLanguageStatus = MutableLiveData(false)
-
-
-    private val _selectedTabIndex = MutableLiveData(0)  // 默認選中第一個tab
-    val selectedTabIndex: LiveData<Int> get() = _selectedTabIndex
-    fun switchTab(index: Int) {
-        _selectedTabIndex.value = index
-    }
-
-
     fun callApiTaipeiTour(language: Language?, currentPage: Int?, nlat: Double?, elong: Double?) {
+
+        _isLoading.value = true
 
         viewModelScope.launch {
             try {
@@ -69,38 +52,45 @@ class ExploreFragmentViewModel @Inject constructor(var repository: ExploreFragme
 
                 } else {
 
-                    _isError.postValue(true)
+                    _isError.postValue(Event("讀取失敗，請稍後再試 ${response.errorBody().toString()}"))
 
                 }
 
             } catch (e: Exception) {
 
                 Log.d(TAG, "Error: ${e.localizedMessage}")
-                _isError.postValue(true)
+                _isError.postValue(Event("讀取失敗，請稍後再試 ${e.localizedMessage}"))
 
             }
         }
     }
 
-    fun incrementPage() {
+    // 位置數據
+    private val _locationData = MutableLiveData<Location>()
+    val locationData: LiveData<Location> get() = _locationData
 
-        _isRvLoading.value = false
-        val current = _currentPage.value ?: 0
-        currentPage.value = current + 1
+    // 位置數據 error
+    private val _locationError = MutableLiveData<Event<String>>()
+    val locationError: LiveData<Event<String>> get() = _locationError
 
-    }
+    // 获取设备位置的函数
+    @SuppressLint("MissingPermission")
+    fun getDeviceLocation(fusedLocationProviderClient: FusedLocationProviderClient) {
+        // 这里包含之前 getDeviceLocation() 里的逻辑
+        // 成功获取位置后更新 LiveData
+        val locationResult = fusedLocationProviderClient.lastLocation
+        locationResult.addOnCompleteListener { task ->
+            if (task.isSuccessful && task.result != null) {
 
+                _locationData.value = task.result
 
-    //中文 繁體 簡體中間會有 "-" 判斷是否有 "-"
-    fun getLocale(language: Language): Locale {
+            } else {
 
-        //中文 繁體 簡體中間會有 "-" 判斷是否有 "-"
-        val parts = language.code.split("-")
-        return if (parts.size > 1) {
-            Locale(parts[0], parts[1].toUpperCase())
-        } else {
-            Locale(parts[0])
+                _locationError.postValue(Event("無法獲取位置"))
+
+            }
         }
-
     }
+
+
 }

@@ -13,7 +13,11 @@
     <string name="attraction">観光名所</string>
     <string name="attraction_introduction">観光名所紹介</string>
     <array name="tab_main">
-        <item>ホーム</item>
-        <item>探索</item>
+        <item>台北</item>
+        <item>近く</item>
     </array>
+    <string name="permission_rationale_location">位置情報を有効にするには、位置情報の許可が必要です。もし許可を与えない場合、一部の機能が制限されます。</string>
+    <string name="location_permission_denied">このサンプルでは、位置情報の許可が必要です。「私の位置」レイヤーを有効にするには、もう一度お試しください。許可が永久に拒否された場合、システム設定 > アプリ >「Google Maps APIデモ」から有効にできます。</string>
+    <string name="permission_required_toast">位置情報の許可が必要です。許可されていない場合、一部の機能が制限されます。</string>
+    <string name="guild_there">ここにナビゲート：%s</string>
 </resources>

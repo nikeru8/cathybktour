@@ -13,7 +13,12 @@
     <string name="attraction">景点</string>
     <string name="attraction_introduction">景点介绍</string>
     <array name="tab_main">
-        <item>首页</item>
-        <item>探索</item>
+        <item>台北</item>
+        <item>附近</item>
     </array>
+    <string name="permission_rationale_location">需要您的权限才能定位您的位置，没有取得权限部分功能将受到限制。</string>
+    <string name="location_permission_denied">此示例需要位置权限以启用「我的位置」图层。请重试并授予访问位置的权限。\n如果权限已永久拒绝，可以从系统设置 > 应用程序 >「Google Maps API示例」中启用。</string>
+    <string name="permission_required_toast">未提供位置权限，部分功能将受到限制。</string>
+    <string name="guild_there">导航点我：%s</string>
+
 </resources>
