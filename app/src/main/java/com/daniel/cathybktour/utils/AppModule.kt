@@ -114,7 +114,6 @@ class AppModule {
     }
 
 
-
     @Provides
     @Singleton
     fun getTabIconsNormal(): IntArray {
@@ -126,7 +125,7 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun getTabIconsSelected (): IntArray {
+    fun getTabIconsSelected(): IntArray {
         return intArrayOf(
             R.drawable.tab_home_s,
             R.drawable.tab_explore_s

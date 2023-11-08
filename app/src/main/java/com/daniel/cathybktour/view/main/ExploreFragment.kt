@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -29,8 +28,6 @@ import com.daniel.cathybktour.utils.viewBinding
 import com.daniel.cathybktour.view.Dialog.TourDetailBottomSheet
 import com.daniel.cathybktour.view.main.viewModel.ExploreFragmentViewModel
 import com.daniel.cathybktour.view.main.viewModel.MainActivityViewModel
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.SupportMapFragment
@@ -63,7 +60,6 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
     private var permissionGranted = false
     private lateinit var mMap: GoogleMap
     private var lastKnownLocation: Location? = null
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private val DEFAULT_ZOOM = 15
     private val defaultLocation = LatLng(25.00996297, 121.455899)
 
@@ -88,15 +84,14 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
         val view = binding.root
 
         initData()
-
         initListener()
+        initObserver()
 
         return view
 
     }
 
     private fun initObserver() {
-
 
         viewModel.taipeiTourData.observe(viewLifecycleOwner) { tourModel ->
 
@@ -145,47 +140,80 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
         }
 
+        viewModel.locationError.observe(viewLifecycleOwner) { event ->
+
+            event.getContentIfNotHandled()?.let { error ->
+                Toast.makeText(requireActivity(), error, Toast.LENGTH_SHORT).show()
+            }
+
+        }
+
         //獲取地圖位置
         viewModel.locationData.observe(viewLifecycleOwner) { location ->
 
-            lastKnownLocation = location
-            if (lastKnownLocation != null) {
+            try {
 
-                mMap.moveCamera(
-                    CameraUpdateFactory.newLatLngZoom(
-                        LatLng(
-                            lastKnownLocation!!.latitude,
-                            lastKnownLocation!!.longitude
-                        ), DEFAULT_ZOOM.toFloat()
+                lastKnownLocation = location
+
+                if (permissionGranted) {
+                    // 使用 location 來更新 UI
+                    location?.let {
+                        // 更新地圖的攝像機位置
+                        mMap.moveCamera(
+                            CameraUpdateFactory.newLatLngZoom(
+                                LatLng(it.latitude, it.longitude),
+                                DEFAULT_ZOOM.toFloat()
+                            )
+                        )
+
+                        // 檢查是否需要調用 API
+                        if (!hasCalledApi) {
+                            hasCalledApi = true
+                            viewModel.callApiTaipeiTour(
+                                mainActivityViewModel.getSelectedLanguage(),
+                                1,
+                                it.latitude,
+                                it.longitude
+                            )
+                        }
+                    } ?: run {
+                        // 位置為 null 時的處理，例如顯示 Toast 或將地圖移動到默認位置
+                        Toast.makeText(activity, "請開啟精準定位，才能獲取您的所在位置喔！", Toast.LENGTH_SHORT).show()
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat()))
+                    }
+
+                } else {
+
+                    mMap.moveCamera(
+                        CameraUpdateFactory
+                            .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat())
                     )
-                )
-                if (!hasCalledApi) {
-                    //確保api只被call一次
-                    hasCalledApi = true
-                    viewModel.callApiTaipeiTour(
-                        mainActivityViewModel.getSelectedLanguage(),
-                        1,
-                        lastKnownLocation!!.latitude,
-                        lastKnownLocation!!.longitude
-                    )
+
+
                 }
+            } catch (e: SecurityException) {
 
-            } else {
-
-                Toast.makeText(activity, "請開啟精準定位，才能獲取您的所在位置喔！", Toast.LENGTH_SHORT).show()
-                mMap.moveCamera(
-                    CameraUpdateFactory
-                        .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat())
-                )
+                Log.e("Exception: %s", e.message, e)
 
             }
 
         }
 
-        viewModel.locationError.observe(viewLifecycleOwner) { event ->
+        // 觀察地圖準備
+        viewModel.mapReady.observe(viewLifecycleOwner) { googleMap ->
 
-            event.getContentIfNotHandled()?.let { error ->
-                Toast.makeText(requireActivity(), error, Toast.LENGTH_SHORT).show()
+            // 配置地圖
+            googleMap?.let { map ->
+
+                // 如果 googleMap 不是 null，則進入此塊
+                mMap = map
+                updateLocationUI()
+
+            } ?: run {
+
+                // 如果 googleMap 是 null
+                Log.e(TAG, "GoogleMap is null")
+
             }
 
         }
@@ -202,13 +230,11 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
     private fun initData() {
 
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext())
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
 
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        viewModel.initMap(mapFragment)
         mapFragment.getMapAsync { googleMap ->
-            mMap = googleMap
-            updateLocationUI()
-            initObserver()
+
         }
 
     }
@@ -218,8 +244,16 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
         binding.ivMyLocation.clicks().throttleFirst(1000, TimeUnit.MILLISECONDS).subscribe {
 
-            checkPermission()
-            viewModel.getDeviceLocation(fusedLocationProviderClient)
+            if (hasLocationPermission()) {
+
+                checkPermission()
+                viewModel.getDeviceLocation()
+
+            } else {
+
+                Toast.makeText(requireContext(), getString(R.string.permission_required_toast), Toast.LENGTH_SHORT).show()
+
+            }
 
         }
 
@@ -239,7 +273,7 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
                 mMap.isMyLocationEnabled = true
                 mMap.uiSettings.isMyLocationButtonEnabled = true
-                getDeviceLocation()
+                viewModel.getDeviceLocation()
 
             } else {
 
@@ -261,10 +295,12 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
     private fun checkPermission() {
         //  1. 檢查是否已授予權限，如果已授予，則啟用我的位置圖層
         if (hasLocationPermission()) {
+
             permissionGranted = true
             mMap.isMyLocationEnabled = true
-            getDeviceLocation()
+            viewModel.getDeviceLocation()
             return
+
         }
 
         // 2. 應顯示權限說明對話框
@@ -275,87 +311,13 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
             PermissionUtils.RationaleDialog.newInstance(LOCATION_PERMISSION_REQUEST_CODE, true)
                 .show(childFragmentManager, "dialog")
             return
+
         }
 
         // 問用戶授權
         requestPermissionLauncher.launch(
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
         )
-    }
-
-
-    private fun getDeviceLocation() {
-
-        /*
-         * 獲取設備的最佳和最新位置，這在某些罕見情況下可能為null，即位置不可用。
-         */
-        try {
-
-            if (permissionGranted) {
-
-                val locationResult = fusedLocationProviderClient.lastLocation
-                locationResult.addOnCompleteListener(requireActivity()) { task ->
-                    if (task.isSuccessful) {
-
-                        // Set the map's camera position to the current location of the device.
-                        lastKnownLocation = task.result
-                        if (lastKnownLocation != null) {
-
-                            mMap.moveCamera(
-                                CameraUpdateFactory.newLatLngZoom(
-                                    LatLng(
-                                        lastKnownLocation!!.latitude,
-                                        lastKnownLocation!!.longitude
-                                    ), DEFAULT_ZOOM.toFloat()
-                                )
-                            )
-                            if (!hasCalledApi) {
-                                //確保api只被call一次
-                                hasCalledApi = true
-                                viewModel.callApiTaipeiTour(
-                                    mainActivityViewModel.getSelectedLanguage(),
-                                    1,
-                                    lastKnownLocation!!.latitude,
-                                    lastKnownLocation!!.longitude
-                                )
-                            }
-
-                        } else {
-
-                            Toast.makeText(activity, "請開啟精準定位，才能獲取您的所在位置喔！", Toast.LENGTH_SHORT).show()
-                            mMap.moveCamera(
-                                CameraUpdateFactory
-                                    .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat())
-                            )
-
-                        }
-
-                    } else {
-
-                        Log.d(TAG, "Current location is null. Using defaults.")
-                        Log.e(TAG, "Exception: %s", task.exception)
-                        mMap.moveCamera(
-                            CameraUpdateFactory
-                                .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat())
-                        )
-                        mMap.uiSettings.isMyLocationButtonEnabled = false
-                    }
-                }
-
-            } else {
-
-                mMap.moveCamera(
-                    CameraUpdateFactory
-                        .newLatLngZoom(defaultLocation, DEFAULT_ZOOM.toFloat())
-                )
-
-            }
-
-        } catch (e: SecurityException) {
-
-            Log.e("Exception: %s", e.message, e)
-
-        }
 
     }
 
@@ -403,7 +365,7 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
     }
 
-    inner class HospitalRenderer(var activity: Activity) : DefaultClusterRenderer<TourClusterItem>(activity, mMap, clusterManager!!) {
+    inner class HospitalRenderer(activity: Activity) : DefaultClusterRenderer<TourClusterItem>(activity, mMap, clusterManager!!) {
 
 
         override fun onClusterItemRendered(clusterItem: TourClusterItem, marker: Marker) {
@@ -417,27 +379,6 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
             markerOptions
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.location))
                 .title(model.title)
-
-        }
-
-        //更新item
-        fun setUpdateItem(model: TourClusterItem) {
-
-            try {
-
-                val marker: Marker = getMarker(model)
-                if (marker != null) {
-
-                    clusterManager?.updateItem(model)
-                    clusterManager?.cluster()
-
-                }
-
-            } catch (e: Exception) {
-
-
-            }
-
 
         }
 
@@ -557,14 +498,22 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
     }
 
-    override fun onDestroy() {
+    override fun onDestroy()
+    {
         clusterRenderer.onRemove()
         clusterManager = null
         super.onDestroy()
+
     }
 
     private fun hasLocationPermission(): Boolean {
-        return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED ||
-                ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED ||
+                ContextCompat.checkSelfPermission(
+                    requireContext(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
     }
 }
