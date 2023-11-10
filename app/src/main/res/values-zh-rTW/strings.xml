@@ -15,6 +15,7 @@
     <array name="tab_main">
         <item>台北</item>
         <item>附近</item>
+        <item>旅遊news</item>
     </array>
     <string name="permission_rationale_location">需要您的權限才能定位您的位置，沒有取得權限部分功能將受到限制。</string>
     <string name="location_permission_denied">此示例需要定位權限以啟用「我的位置」圖層。請重試並授予訪問位置的權限。\n如果權限已永久拒絕，則可以從系統設置 > 應用程序 >「Google Maps API示例」中啟用。</string>

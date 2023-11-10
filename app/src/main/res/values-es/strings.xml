@@ -15,6 +15,7 @@
     <array name="tab_main">
         <item>Taipéi</item>
         <item>Cerca</item>
+        <item>Noticias de Viajes</item>
     </array>
     <string name="permission_rationale_location">Para habilitar la capa de mi ubicación, se requiere permiso de ubicación. Inténtelo nuevamente y otorgue acceso para utilizar la ubicación.\nSi el permiso ha sido denegado permanentemente, se puede habilitar desde Configuración del sistema &gt; Aplicaciones &gt; "Google Maps API Demos".</string>
     <string name="location_permission_denied">Esta muestra requiere permiso de ubicación para habilitar la capa de mi ubicación. Inténtelo nuevamente y otorgue acceso para utilizar la ubicación.\nSi el permiso ha sido denegado permanentemente, se puede habilitar desde Configuración del sistema &gt; Aplicaciones &gt; "Google Maps API Demos".</string>

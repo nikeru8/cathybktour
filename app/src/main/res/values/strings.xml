@@ -16,6 +16,7 @@
     <array name="tab_main">
         <item>台北</item>
         <item>附近</item>
+        <item>旅遊news</item>
     </array>
     <string name="google_maps_key" translatable="false" templateMergeStrategy="preserve">AIzaSyBvTvpm50ECvPYcZi5k5JjD_mpPLfonOEg</string>
     <string name="permission_rationale_location">需要您的權限才能定位您的位置，沒有取得權限部分功能將受到限制。</string>

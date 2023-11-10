@@ -15,6 +15,7 @@
     <array name="tab_main">
         <item>台北</item>
         <item>近く</item>
+        <item>旅行ニュース</item>
     </array>
     <string name="permission_rationale_location">位置情報を有効にするには、位置情報の許可が必要です。もし許可を与えない場合、一部の機能が制限されます。</string>
     <string name="location_permission_denied">このサンプルでは、位置情報の許可が必要です。「私の位置」レイヤーを有効にするには、もう一度お試しください。許可が永久に拒否された場合、システム設定 > アプリ >「Google Maps APIデモ」から有効にできます。</string>

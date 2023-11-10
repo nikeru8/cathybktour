@@ -15,6 +15,7 @@
     <array name="tab_main">
         <item>타이베이</item>
         <item>가까운 곳</item>
+        <item>여행 뉴스</item>
     </array>
     <string name="permission_rationale_location">『내 위치』 레이어를 활성화하려면 위치 권한이 필요합니다. 다시 시도하고 위치 사용 권한을 부여하십시오.\n권한이 영구적으로 거부된 경우 시스템 설정 > 앱 > 『Google Maps API 데모』에서 활성화할 수 있습니다.</string>
     <string name="location_permission_denied">이 샘플은 위치 권한이 필요하여 『내 위치』 레이어를 활성화합니다. 다시 시도하고 위치 사용 권한을 부여하십시오.\n권한이 영구적으로 거부된 경우 시스템 설정 > 앱 > 『Google Maps API 데모』에서 활성화할 수 있습니다.</string>

@@ -13,6 +13,9 @@ import com.daniel.cathybktour.R
 import com.daniel.cathybktour.databinding.ActivityMainBinding
 import com.daniel.cathybktour.databinding.TabItemBinding
 import com.daniel.cathybktour.utils.Utils
+import com.daniel.cathybktour.view.main.fragment.ExploreFragment
+import com.daniel.cathybktour.view.main.fragment.HomeFragment
+import com.daniel.cathybktour.view.main.fragment.NewsFragment
 import com.daniel.cathybktour.view.main.viewModel.MainActivityViewModel
 import com.google.android.material.tabs.TabLayout
 import com.ncapdevi.fragnav.FragNavController
@@ -34,20 +37,22 @@ class MainActivity : AppCompatActivity(), FragNavController.TransactionListener,
         R.id.fl_content
     )
 
-    override val numberOfRootFragments: Int = 2
+    override val numberOfRootFragments: Int = 3
     private lateinit var tabs: Array<String>
 
     private val mTabIconsNormal = intArrayOf(
 
         R.drawable.tab_home_n,
-        R.drawable.tab_explore_n
+        R.drawable.tab_explore_n,
+        R.drawable.tab_news_n
 
     )
 
     private val mTabIconsSelected = intArrayOf(
 
         R.drawable.tab_home_s,
-        R.drawable.tab_explore_s
+        R.drawable.tab_explore_s,
+        R.drawable.tab_news_s
 
     )
 
@@ -91,6 +96,7 @@ class MainActivity : AppCompatActivity(), FragNavController.TransactionListener,
 
             FragNavController.TAB1 -> HomeFragment.newInstance()
             FragNavController.TAB2 -> ExploreFragment.newInstance()
+            FragNavController.TAB3 -> NewsFragment.newInstance()
             else -> throw IllegalStateException("Need to send an index that we know")
 
         }

@@ -1,4 +1,4 @@
-package com.daniel.cathybktour.view.main
+package com.daniel.cathybktour.view.main.fragment
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -498,8 +498,7 @@ class ExploreFragment : Fragment(), ClusterManager.OnClusterClickListener<TourCl
 
     }
 
-    override fun onDestroy()
-    {
+    override fun onDestroy() {
         clusterRenderer.onRemove()
         clusterManager = null
         super.onDestroy()

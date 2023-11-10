@@ -1,11 +1,11 @@
 package com.daniel.cathybktour.utils
 
 import android.util.Log
-import com.daniel.cathybktour.R
 import com.daniel.cathybktour.api.TaipeiTourService
 import com.daniel.cathybktour.model.Language
 import com.daniel.cathybktour.repository.ExploreFragmentRepository
 import com.daniel.cathybktour.repository.MainActivityRepository
+import com.daniel.cathybktour.repository.NewsFragmentRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,6 +35,12 @@ class AppModule {
     @Singleton
     fun provideExploreRepository(taipeiTourService: TaipeiTourService): ExploreFragmentRepository {
         return ExploreFragmentRepository(taipeiTourService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideNewsRepository(taipeiTourService: TaipeiTourService): NewsFragmentRepository {
+        return NewsFragmentRepository(taipeiTourService)
     }
 
     class LogJsonInterceptor : Interceptor {
@@ -111,25 +117,6 @@ class AppModule {
     @Singleton
     fun provideTaipeiTourService(retrofit: Retrofit): TaipeiTourService {
         return retrofit.create(TaipeiTourService::class.java)
-    }
-
-
-    @Provides
-    @Singleton
-    fun getTabIconsNormal(): IntArray {
-        return intArrayOf(
-            R.drawable.tab_home_n,
-            R.drawable.tab_explore_n
-        )
-    }
-
-    @Provides
-    @Singleton
-    fun getTabIconsSelected(): IntArray {
-        return intArrayOf(
-            R.drawable.tab_home_s,
-            R.drawable.tab_explore_s
-        )
     }
 
 }

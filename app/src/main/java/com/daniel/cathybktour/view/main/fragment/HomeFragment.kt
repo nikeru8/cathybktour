@@ -1,10 +1,8 @@
-package com.daniel.cathybktour.view.main
+package com.daniel.cathybktour.view.main.fragment
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +18,7 @@ import com.daniel.cathybktour.model.Language
 import com.daniel.cathybktour.utils.viewBinding
 import com.daniel.cathybktour.view.adapter.LanguageAdapter
 import com.daniel.cathybktour.view.adapter.TourAdapter
+import com.daniel.cathybktour.view.main.TourItemDetailFragment
 import com.daniel.cathybktour.view.main.viewModel.MainActivityViewModel
 import com.jakewharton.rxbinding2.view.clicks
 import java.util.concurrent.TimeUnit

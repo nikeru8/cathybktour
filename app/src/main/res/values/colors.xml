@@ -14,4 +14,5 @@
     <color name="gray_8e8e8e">#8E8E8E</color>
     <color name="blue_aaccff">#AACCFF</color>
     <color name="gray_80FFFFFF">#80FFFFFF</color>
+    <color name="tab_normal">#80FFFFFF</color>
 </resources>

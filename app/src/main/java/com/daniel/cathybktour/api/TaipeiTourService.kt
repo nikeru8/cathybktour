@@ -1,5 +1,6 @@
 package com.daniel.cathybktour.api
 
+import com.daniel.cathybktour.model.NewsModel
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Headers
@@ -12,7 +13,7 @@ interface TaipeiTourService {
     @GET("open-api/{language}/Attractions/All")
     suspend fun getAttractions(
         @Path("language") language: String,
-        @Query("page") page: Int?
+        @Query("page") page: Int?,
     ): Response<TourModel>
 
     @Headers("accept: application/json")
@@ -21,7 +22,14 @@ interface TaipeiTourService {
         @Path("language") language: String?,
         @Query("page") page: Int?,
         @Query("nlat") nlat: Double?,
-        @Query("elong") elong: Double?
+        @Query("elong") elong: Double?,
     ): Response<TourModel>
+
+    @Headers("accept: application/json")
+    @GET("open-api/{language}/Events/News?page=1")
+    suspend fun getNews(
+        @Path("language") language: String?,
+        @Query("page") page: Int?,
+    ): Response<NewsModel>
 
 }

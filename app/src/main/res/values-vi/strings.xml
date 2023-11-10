@@ -15,6 +15,7 @@
     <array name="tab_main">
         <item>Đài Bắc</item>
         <item>Gần đây</item>
+        <item>Tin Tức Du Lịch</item>
     </array>
     <string name="permission_rationale_location">Cần quyền truy cập vị trí của bạn để kích hoạt lớp "vị trí của tôi", thiếu quyền truy cập sẽ hạn chế một số tính năng.</string>
     <string name="location_permission_denied">Mẫu này yêu cầu quyền truy cập vị trí để kích hoạt lớp "vị trí của tôi". Vui lòng thử lại và cấp quyền truy cập để sử dụng vị trí.\nNếu quyền truy cập đã bị từ chối vĩnh viễn, bạn có thể bật chúng từ Cài đặt hệ thống &gt; Ứng dụng &gt; "Google Maps API Demos".</string>
