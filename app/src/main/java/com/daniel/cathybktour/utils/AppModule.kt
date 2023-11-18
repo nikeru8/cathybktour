@@ -1,6 +1,8 @@
 package com.daniel.cathybktour.utils
 
+import android.content.Context
 import android.util.Log
+import androidx.room.Room
 import com.daniel.cathybktour.api.TaipeiTourService
 import com.daniel.cathybktour.model.Language
 import com.daniel.cathybktour.repository.ExploreFragmentRepository
@@ -9,6 +11,7 @@ import com.daniel.cathybktour.repository.NewsFragmentRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -117,6 +120,22 @@ class AppModule {
     @Singleton
     fun provideTaipeiTourService(retrofit: Retrofit): TaipeiTourService {
         return retrofit.create(TaipeiTourService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTourItemDao(appDatabase: AppDatabase): TourItemDao {
+        return appDatabase.tourItemDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideAppDatabase(@ApplicationContext context: Context): AppDatabase {
+        return Room.databaseBuilder(
+            context.applicationContext,
+            AppDatabase::class.java,
+            "db_tour_data"
+        ).build()
     }
 
 }

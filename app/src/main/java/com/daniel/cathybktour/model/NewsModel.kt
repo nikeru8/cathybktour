@@ -1,14 +1,14 @@
 package com.daniel.cathybktour.model
 
 data class NewsModel(
-    val `data`: MutableList<Data> = mutableListOf(),
+    val `data`: MutableList<NewsData> = mutableListOf(),
     val total: Int = 0,
 )
 
-data class Data(
-    val begin: Any? = null,
+data class NewsData(
+    val begin: String? = "",
     val description: String = "",
-    val end: Any? = null,
+    val end: String? = "",
     val files: MutableList<File> = mutableListOf(),
     val id: Int = 0,
     val links: MutableList<Link> = mutableListOf(),

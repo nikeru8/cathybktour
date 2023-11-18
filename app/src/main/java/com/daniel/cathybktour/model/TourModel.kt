@@ -1,10 +1,13 @@
 package com.daniel.cathybktour.api
 
 import android.os.Parcelable
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import kotlinx.android.parcel.Parcelize
+import kotlinx.serialization.Serializable
 
-
+@Serializable
 data class TourModel(
     @SerializedName("data")
     var data: MutableList<TourItem> = mutableListOf<TourItem>(),
@@ -12,12 +15,17 @@ data class TourModel(
     var total: Int? = 0,
 )
 
+@Entity //dao
+@Serializable
 @Parcelize
 data class TourItem(
+    @PrimaryKey //dao
+    @SerializedName("id")
+    var id: Int? = 0,
     @SerializedName("address")
     var address: String? = "",
     @SerializedName("category")
-    var category: List<Category?>? = listOf(),
+    var category: MutableList<Category?>? = mutableListOf(),
     @SerializedName("distric")
     var distric: String? = "",
     @SerializedName("elong")
@@ -29,17 +37,15 @@ data class TourItem(
     @SerializedName("fax")
     var fax: String? = "",
     @SerializedName("files")
-    var files: List<Files?>? = mutableListOf(),
+    var files: MutableList<Files?>? = mutableListOf(),
     @SerializedName("friendly")
-    var friendly: List<Friendly?>? = listOf(),
-    @SerializedName("id")
-    var id: Int? = 0,
+    var friendly: MutableList<Friendly?>? = mutableListOf(),
     @SerializedName("images")
     var images: MutableList<Image?> = mutableListOf(),
     @SerializedName("introduction")
     var introduction: String? = "",
     @SerializedName("links")
-    var links: List<Link?>? = listOf(),
+    var links: MutableList<Link?>? = mutableListOf(),
     @SerializedName("modified")
     var modified: String? = "",
     @SerializedName("months")
@@ -59,11 +65,11 @@ data class TourItem(
     @SerializedName("remind")
     var remind: String? = "",
     @SerializedName("service")
-    var service: List<Service?>? = listOf(),
+    var service: MutableList<Service?>? = mutableListOf(),
     @SerializedName("staytime")
     var staytime: String? = "",
     @SerializedName("target")
-    var target: List<Target?>? = listOf(),
+    var target: MutableList<Target?>? = mutableListOf(),
     @SerializedName("tel")
     var tel: String? = "",
     @SerializedName("ticket")
@@ -74,22 +80,27 @@ data class TourItem(
     var zipcode: String? = "",
 ) : Parcelable
 
+@Serializable
 @Parcelize
 data class Category(
     @SerializedName("id")
     var id: Int? = 0,
     @SerializedName("name")
     var name: String? = "",
+    var tourItemId: Int? = 0,//外部參照
 ) : Parcelable
 
+@Serializable
 @Parcelize
 data class Friendly(
     @SerializedName("id")
     var id: Int? = 0,
     @SerializedName("name")
     var name: String? = "",
+    var tourItemId: Int? = 0,//外部參照
 ) : Parcelable
 
+@Serializable
 @Parcelize
 data class Image(
     @SerializedName("ext")
@@ -98,32 +109,40 @@ data class Image(
     var src: String? = "",
     @SerializedName("subject")
     var subject: String? = "",
+    var tourItemId: Int? = 0,//外部參照
 ) : Parcelable
 
+@Serializable
 @Parcelize
 data class Link(
     @SerializedName("src")
     var src: String? = "",
     @SerializedName("subject")
     var subject: String? = "",
+    var tourItemId: Int? = 0,//外部參照
 ) : Parcelable
 
+@Serializable
 @Parcelize
 data class Service(
     @SerializedName("id")
     var id: Int? = 0,
     @SerializedName("name")
     var name: String? = "",
+    var tourItemId: Int? = 0,//外部參照
 ) : Parcelable
 
+@Serializable
 @Parcelize
 data class Target(
     @SerializedName("id")
     var id: Int? = 0,
     @SerializedName("name")
     var name: String? = "",
+    var tourItemId: Int? = 0,//外部參照
 ) : Parcelable
 
+@Serializable
 @Parcelize
 data class Files(
     @SerializedName("src")
@@ -132,4 +151,5 @@ data class Files(
     var subject: String? = "",
     @SerializedName("ext")
     var ext: String? = "",
+    var tourItemId: Int? = 0,//外部參照
 ) : Parcelable

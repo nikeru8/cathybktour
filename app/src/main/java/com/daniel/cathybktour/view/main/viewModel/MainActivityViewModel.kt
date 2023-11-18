@@ -5,9 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.daniel.cathybktour.api.TourItem
 import com.daniel.cathybktour.api.TourModel
 import com.daniel.cathybktour.model.Language
 import com.daniel.cathybktour.repository.MainActivityRepository
+import com.daniel.cathybktour.utils.TourItemDao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.util.Locale
@@ -17,9 +19,15 @@ import javax.inject.Inject
 //@Inject 此處的 repository 依賴需要 Hilt 進行注入。Hilt 會在建構這個 ViewModel 的時候，自動提供一個 MainActivityRepository 的實例給它。
 // 這裡注入語言列表
 @HiltViewModel //表示該 ViewModel 要使用 Hilt 來注入其依賴。因為是viewModel生命週期有所不同，需要使用到HitViewModel
-class MainActivityViewModel @Inject constructor(private val repository: MainActivityRepository, val languages: List<Language>, ) : ViewModel() {
+class MainActivityViewModel @Inject constructor(
+    private val repository: MainActivityRepository,
+    val languages: List<Language>,
+    private val tourItemDao: TourItemDao,
+) : ViewModel() {
 
     private val TAG = MainActivityViewModel::class.java.simpleName
+
+    val allTourItems: LiveData<MutableList<TourItem>> = tourItemDao.getAll()
 
     /*
      * true 可以繼續往下讀取
