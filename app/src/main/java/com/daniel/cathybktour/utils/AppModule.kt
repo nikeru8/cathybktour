@@ -8,6 +8,7 @@ import com.daniel.cathybktour.model.Language
 import com.daniel.cathybktour.repository.ExploreFragmentRepository
 import com.daniel.cathybktour.repository.MainActivityRepository
 import com.daniel.cathybktour.repository.NewsFragmentRepository
+import com.daniel.cathybktour.repository.SplashRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,6 +34,13 @@ class AppModule {
     fun provideMainActivityRepository(taipeiTourService: TaipeiTourService): MainActivityRepository {
         return MainActivityRepository(taipeiTourService)
     }
+
+    @Provides
+    @Singleton
+    fun provideSplashRepository(taipeiTourService: TaipeiTourService): SplashRepository {
+        return SplashRepository(taipeiTourService)
+    }
+
 
     @Provides
     @Singleton

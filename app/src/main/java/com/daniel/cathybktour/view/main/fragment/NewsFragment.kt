@@ -73,8 +73,6 @@ class NewsFragment : Fragment() {
 
                 is Result.success -> {
 
-                    Log.d("TAG", "sssss call api success")
-
                     binding.recyclerview.apply {
 
                         val llm = LinearLayoutManager(context)
@@ -84,7 +82,7 @@ class NewsFragment : Fragment() {
 
                             NewsAdapter(it, itemClick = { newsData ->
 
-                                newsData?.url?.let { url ->
+                                newsData.url.let { url ->
 
                                     Intent(activity, CommonWebViewActivity::class.java).apply {
                                         putExtra("url", url)

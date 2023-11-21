@@ -2,7 +2,6 @@ package com.daniel.cathybktour.view.adapter
 
 
 import android.annotation.SuppressLint
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -140,7 +139,6 @@ class TourAdapter(var activity: FragmentActivity?, private val itemClick: (TourI
 
     }
 
-
     fun showFooter(show: Boolean) {
 
         if (currentList.isEmpty()) {
@@ -157,7 +155,6 @@ class TourAdapter(var activity: FragmentActivity?, private val itemClick: (TourI
     }
 
     fun getAttractionsSize(): String = currentList.count().toString()
-
 
     override fun onCurrentListChanged(
         previousList: MutableList<TourItem>,

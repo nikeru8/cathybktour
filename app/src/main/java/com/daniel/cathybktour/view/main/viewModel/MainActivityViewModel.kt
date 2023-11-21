@@ -29,6 +29,8 @@ class MainActivityViewModel @Inject constructor(
 
     val allTourItems: LiveData<MutableList<TourItem>> = tourItemDao.getAll()
 
+
+
     /*
      * true 可以繼續往下讀取
      * false 阻擋
@@ -41,7 +43,9 @@ class MainActivityViewModel @Inject constructor(
 
     private val _isLoading = MutableLiveData(true)
     val isLoading: LiveData<Boolean> get() = _isLoading
-
+    fun setLoading(value: Boolean) {
+        _isLoading.value = value
+    }
 
     private val _isError = MutableLiveData(false)
     val isError: LiveData<Boolean> get() = _isError

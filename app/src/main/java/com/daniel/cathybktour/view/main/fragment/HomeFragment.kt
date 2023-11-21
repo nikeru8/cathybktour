@@ -12,22 +12,16 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.Room
 import com.daniel.cathybktour.R
-import com.daniel.cathybktour.api.TourModel
 import com.daniel.cathybktour.databinding.DialogLanguageSelectionBinding
 import com.daniel.cathybktour.databinding.FragmentHomeBinding
 import com.daniel.cathybktour.model.Language
-import com.daniel.cathybktour.utils.AppDatabase
 import com.daniel.cathybktour.utils.viewBinding
 import com.daniel.cathybktour.view.adapter.LanguageAdapter
 import com.daniel.cathybktour.view.adapter.TourAdapter
 import com.daniel.cathybktour.view.main.TourItemDetailFragment
 import com.daniel.cathybktour.view.main.viewModel.MainActivityViewModel
 import com.jakewharton.rxbinding2.view.clicks
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
@@ -119,7 +113,7 @@ class HomeFragment : Fragment() {
                         )
                     }
 
-                    if (viewModel.isRvLoading.value == true && dy > 0 && lastVisibleItem == totalItemCount - 1) { //滑動到底部
+                    if (viewModel.isRvLoading.value == true && dy > 0 && lastVisibleItem == totalItemCount - 1 && viewModel.currentLanguage.value?.code != "zh-tw") { //滑動到底部
 
                         viewModel.incrementPage()
                         viewModel.callApiTaipeiTour(viewModel.getSelectedLanguage(), viewModel.currentPage.value) //底部call api
@@ -136,16 +130,6 @@ class HomeFragment : Fragment() {
         //獲取主要資料
         viewModel.taipeiTourData.observe(viewLifecycleOwner) { tourModel ->
 
-
-            val appDatabase = AppDatabase.getDatabase(requireContext())
-            val updatedTourModel = updateTourItemIds(tourModel)
-
-            updatedTourModel?.data?.let { tourItems ->
-                CoroutineScope(Dispatchers.IO).launch {
-                    appDatabase.tourItemDao().insertAll(tourItems)
-                }
-            }
-
             if (viewModel.changeLanguageStatus.value == true) {
 
                 tourAdapter.submitList(tourModel?.data) {
@@ -161,11 +145,6 @@ class HomeFragment : Fragment() {
                 tourAdapter.updateData(tourModel?.data)
 
             }
-
-            val db = Room.databaseBuilder(
-                requireContext(),
-                AppDatabase::class.java, "db_tour_model"
-            ).build()
 
         }
 
@@ -202,14 +181,40 @@ class HomeFragment : Fragment() {
 
             // 更新 UI
             initView()
-            viewModel.callApiTaipeiTour(language = language, viewModel.currentPage.value)//init call api && selected language call api
+            //假設語言切換到繁體中文，直接使用Room內的資料
+            if (viewModel.currentLanguage.value?.code != "zh-tw") {
+
+                viewModel.callApiTaipeiTour(language = language, viewModel.currentPage.value)//init call api && selected language call api
+
+            } else {
+
+                if (viewModel.allTourItems.value != null) {
+
+                    viewModel.allTourItems.value.let { model ->
+
+
+                        tourAdapter.submitList(model) {
+
+                            llm.scrollToPosition(0)
+
+                        }
+                        viewModel.totalDenominator.value = model?.size.toString()
+                        viewModel.setLoading(false)
+
+                    }
+                }
+
+
+            }
 
         }
 
         //database
         viewModel.allTourItems.observe(viewLifecycleOwner) { model ->
 
-            Log.d("TAG", "checkpoint model size - ${model.size}")
+            tourAdapter.submitList(model)
+            viewModel.totalDenominator.value = model.size.toString()
+            viewModel.setLoading(false)
 
         }
 
@@ -266,24 +271,6 @@ class HomeFragment : Fragment() {
 
         }
 
-    }
-
-
-    fun updateTourItemIds(tourModel: TourModel?): TourModel? {
-        tourModel?.data?.forEach { tourItem ->
-
-            val tourItemId = tourItem.id ?: return@forEach
-
-            tourItem.category?.forEach { it?.tourItemId = tourItemId }
-            tourItem.friendly?.forEach { it?.tourItemId = tourItemId }
-            tourItem.images.forEach { it?.tourItemId = tourItemId }
-            tourItem.links?.forEach { it?.tourItemId = tourItemId }
-            tourItem.service?.forEach { it?.tourItemId = tourItemId }
-            tourItem.target?.forEach { it?.tourItemId = tourItemId }
-            tourItem.files?.forEach { it?.tourItemId = tourItemId }
-        }
-
-        return tourModel
     }
 
 }

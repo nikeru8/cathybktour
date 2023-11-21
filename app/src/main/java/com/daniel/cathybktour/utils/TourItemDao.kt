@@ -20,4 +20,7 @@ interface TourItemDao {
     @Delete
     suspend fun delete(tourItem: TourItem)
 
+    @Query("SELECT * FROM TourItem WHERE name LIKE :searchQuery")
+    fun searchTourItems(searchQuery: String): LiveData<List<TourItem>>
+
 }
