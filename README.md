@@ -1,17 +1,15 @@
 # cathybktour
 
-Youtube連結
-Done - version
-https://youtu.be/4qz_Q9_ezGA
 
-探索version
-https://youtu.be/Aps3nICK5N4?si=-1jtyqWsjkxC1yip
+實作影片：https://youtu.be/IcNSz-jVhmU?si=o3aSOVV1ef1ZoVzw
 
 using - 
 
 coroutine
 
 inject
+
+Room
 
 =====================================
 
